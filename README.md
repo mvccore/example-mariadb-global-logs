@@ -9,5 +9,5 @@
 ## Instalation
 ```shell
 # load project template into './my-project' (directory is created if doesn't exist)
-composer create-project mvccore/project-basic my-project
+composer create-project mvccore/example-mariadb-global-logs
 ```
