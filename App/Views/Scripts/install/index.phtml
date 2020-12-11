@@ -1,0 +1,60 @@
+<div class="content">
+
+	<h1><?=$title?></h1>
+	
+	<p>
+		The script has been executed for first time.<br />
+		There were necessary to create some files and folders and initialize database structure.<br />
+		You can run this script any time again, if you have removed anything and you want to re-install it.
+	</p>
+	
+	<hr />
+
+	<h3>Config File:</h3>
+	<?php if ($configInstalledBefore): ?>
+		<p><i>App config has been already installed.</i></p>
+	<?php elseif ($configInstalledAfter): ?>
+		<p><b>App config has been installed successfully.</b></p>
+	<?php else: ?>
+		<p><b>App config install error: <?=$configInstallErrorMsg?></b></p>
+		<pre><code><?=$configInstallStack?></code></pre>
+	<?php endif; ?>
+
+	<h3>Data Directory:</h3>
+	<?php if ($dataInstalledBefore): ?>
+		<p><i>Data directory has been already installed.</i></p>
+	<?php elseif ($dataInstalledAfter): ?>
+		<p><b>Data directory has been installed successfully.</b></p>
+	<?php else: ?>
+		<p><b>Data directory install error: <?=$dataInstallErrorMsg?></b></p>
+		<pre><code><?=$dataInstallStack?></code></pre>
+	<?php endif; ?>
+
+	<h3>CLI Scripts:</h3>
+	<?php if ($cliInstalledBefore): ?>
+		<p><i>CLI scripts directory has been already installed.</i></p>
+	<?php elseif ($cliInstalledAfter): ?>
+		<p><b>CLI scripts directory has been installed successfully.</b></p>
+	<?php else: ?>
+		<p><b>CLI scripts directory install error: <?=$cliInstallErrorMsg?></b></p>
+		<pre><code><?=$cliInstallStack?></code></pre>
+	<?php endif; ?>
+
+	<h3>Database:</h3>
+	<?php if ($dbInstalledBefore): ?>
+		<p><i>App database has been already installed.</i></p>
+	<?php elseif ($dbInstalledAfter): ?>
+		<p><b>App database has been installed successfully.</b></p>
+	<?php else: ?>
+		<p><b>App database install error: <?=$dbInstallErrorMsg?></b></p>
+		<?php if ($dbInstallCmd): ?>
+			<pre><code><?=$dbInstallCmd?></code></pre>
+		<?php endif; ?>
+		<pre><code><?=$dbInstallStack?></code></pre>
+	<?php endif; ?>
+
+	<hr />
+	
+	<a href="<?=$url('Index:Index')?>">Back to home</a>
+
+</div>

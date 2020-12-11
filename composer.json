@@ -1,0 +1,39 @@
+{
+	"name": "mvccore/example-mariadb-global-logs",
+	"type": "project",
+	"description": "MvcCore Example - MariaDB Global Logs Explorer",
+	"keywords": [
+		"mvccore", 
+		"project",
+		"example",
+		"mariadb",
+		"mysql",
+		"global",
+		"log",
+		"logs",
+		"explorer",
+		"parser"
+	],
+	"license": ["BSD-3-Clause"],
+	"authors": [
+		{
+			"name": "Tom Flidr",
+			"homepage": "https://github.com/tomFlidr"
+		}
+	],
+	"require": {
+		"php": ">=5.4.0",
+		"mvccore/mvccore": "dev-master",
+		"mvccore/ext-form": "dev-master",
+		"mvccore/ext-debug-tracy": "dev-master",
+		"mvccore/ext-debug-tracy-mvccore": "dev-master",
+		"mvccore/ext-debug-tracy-routing": "dev-master",
+		"mvccore/ext-debug-tracy-session": "dev-master",
+		"mvccore/ext-view-helper-assets": "dev-master",
+		"mvccore/ext-view-helper-formatnumber": "dev-master",
+		"mvccore/ext-view-helper-formatdate": "dev-master",
+		"mvccore/ext-view-helper-truncate": "dev-master",
+		"jdorn/sql-formatter": "1.3.x-dev"
+	},
+	"minimum-stability": "dev"
+}

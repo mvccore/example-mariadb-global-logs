@@ -1,0 +1,201 @@
+html,body{margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.25em;text-align:left;}
+
+a{color:#236fd0;cursor:pointer;text-decoration:none;border-bottom:1px solid #236fd0;}
+a:hover,a:focus,a:active{color:#6697d6;border-bottom:1px solid #6697d6;}
+a:visited{color:#587598;border-bottom:1px solid #587598;}
+
+.content{padding:20px;}
+.content h1{font-size:2.5em;line-height:1.5em;margin:0 0 25px 0;}
+.content a.back{float:right;margin:20px 10px 0 0;}
+
+div.errors{margin:15px 0;}
+div.error{color:red;font-weight:bold;}
+
+table.log-files{border-collapse:collapse;}
+table.log-files tr th,
+table.log-files tr td{border:1px solid #b7b7b7;padding:4px 10px;}
+
+table.connections{border-collapse:collapse;}
+table.connections tr.marked td{background:#ddd;}
+table.connections th,
+table.connections td{border:1px solid #b7b7b7;padding:4px 10px;}
+
+
+a.expand-collapse-control{
+	font-size:1.15em;
+	line-height:1.25em;
+	margin:0 10px 5px 0;
+	font-weight:bold;
+}
+a.expand-collapse-control .collase{
+	display:none;
+}
+a.expand-collapse-control.expanded .expand{
+	display:none;
+}
+a.expand-collapse-control.expanded .collase{
+	display:inline-block;
+}
+
+.content .requests{
+}
+.requests .request{
+}
+.request .date{
+	font-size:1.25em;
+	line-height:1.25em;
+	margin:15px 0 5px 0;
+	font-weight:bold;
+}
+.request a.expand-collapse-control{
+	float:right;
+}
+
+textarea.requests-copy2clipboard{position:absolute;opacity:0.01;top:-50px;left:-50px;height:30px;width:30px;}
+
+
+.request .request-queries{
+	border-bottom:1px solid #a6a6a6;
+}
+.request-queries .query{
+	border-top:1px solid #a6a6a6;
+	background:rgba(0,0,0,0.05);
+}
+.query .query-head{
+	padding:2px 10px;
+	font-family:Consolas;
+	white-space:nowrap;
+	overflow:hidden;
+}
+.query.query-type-insert{background:#cbffcb;}
+.query.query-type-update{background:#ffe7a3;}
+.query.query-type-delete,
+.query.query-type-truncate{background:#ffcbd3;}
+.query.query-type-start,
+.query.query-type-commit{background:#e6bfff !important;}
+.query.query-type-rollback{background:#f16183;}
+.query.query-type-set{background:#bcceff;}
+
+.query .query-head.hidden{
+	display: none;
+}
+.query-head .query-head-text{
+
+}
+.query-head .query-head-datetime {
+	float:right;
+	display:none;
+	width:155px;
+	text-align:right;
+}
+.query-head .query-head-id {
+	float:right;
+	display:none;
+}
+.query-head .query-head-count{
+	float: right;
+	display: inline-block;
+	width: 30px;
+	text-align: right;
+}
+.query .query-content{
+	position: relative;
+}
+.query .query-content.hidden{
+	display: none;
+}
+.query-content .query-line{
+	position: absolute;
+	right: 340px;
+	top: 4px;
+	font-size: 0.85em;
+}
+.query-content .query-copy{
+	position: absolute;
+	right: 280px;
+	top: 4px;
+	font-size: 0.85em;
+}
+.query-content .query-id{
+	position: absolute;
+	right: 195px;
+	top: 4px;
+	font-size: 0.85em;
+	font-style: italic;
+	color: #888;
+}
+.query-content .query-count{
+	position: absolute;
+	right: 130px;
+	top: 4px;
+	font-size: 0.85em;
+	font-style: italic;
+	color: #888;
+}
+.query-content .query-datetime{
+	position: absolute;
+	right: 7px;
+	top: 4px;
+	font-size: 0.85em;
+	font-style: italic;
+	color: #888;
+}
+.query-content .query-command{
+
+}
+.query-content .query-command pre{
+	margin:0;
+	padding:3px 10px;
+	background-color:#fffbe9 !important;
+}
+
+.query:hover  .query-head,
+.query:focus  .query-head,
+.query:active .query-head{
+	background:rgba(0,0,0,0.13);
+}
+
+.query:hover .query-head .query-head-datetime,
+.query:focus .query-head .query-head-datetime,
+.query:active .query-head .query-head-datetime,
+.query:hover .query-head .query-head-id,
+.query:focus .query-head .query-head-id,
+.query:active .query-head .query-head-id {
+	display:inline-block;
+}
+
+.query:hover  .query-content .query-command pre,
+.query:focus  .query-content .query-command pre,
+.query:active .query-content .query-command pre{
+	background-color:#f5eece !important;
+}
+
+
+table.editor{
+	border-collapse:collapse;
+	width: 100%;
+}
+table.editor th,
+table.editor td{
+	font-family:Consolas;
+	font-size:14px;
+	line-height: 1.15;
+}
+table.editor tr.selected th{
+	background:#444;
+	font-weight:bold;
+}
+table.editor tr.selected td{
+	background:#ddd;
+	font-weight:bold;
+}
+table.editor tr th{
+	background:#000;
+	color:#fff;
+	padding:0 10px;
+}
+table.editor tr td pre {
+	display:inline-block;
+	white-space:nowrap;
+	margin:0 10px;
+}

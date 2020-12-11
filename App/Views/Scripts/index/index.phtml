@@ -1,0 +1,86 @@
+<?php /** @var $this \MvcCore\View */ ?>
+<?php /** @var $logFile \App\Models\LogFile */ ?>
+
+<div class="content">
+
+	<h1><?=$title?></h1>
+
+	<?php if (count($logFiles) > 0): ?>
+
+		<?php if (count($errors) > 0): ?>
+			<div class="errors">
+				<?php foreach ($errors as $error): ?>
+					<div class="error"><?=$error[0]?></div>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
+
+		<table class="log-files">
+			<tbody>
+				<thead>
+					<tr>
+						<th>File Name</th>
+						<th>Created</th>
+						<th>File Size</th>
+						<th>Lines Count</th>
+						<th>Processing</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($logFiles as $hash => $logFile): ?>
+						<tr>
+							<td class="log-link" >
+								<?php if ($logFile->GetProcessed() !== \App\Models\LogFile::NOT_PROCESSED): ?>
+									<a href="<?=$url('Connections:Index', [
+										'id_general_log' => $logFile->GetIdGeneralLog()
+									])?>"><?php
+										echo $logFile->GetFileName();
+									?></a>
+								<?php else: ?>
+									<?=$logFile->GetFileName()?>
+								<?php endif; ?>
+							
+							</td>
+							<td><?=$this->FormatDate(
+								$logFile->GetCreated()
+							)?></td>
+							<td align="right">
+								<?=$this->FormatBytes($logFile->GetFileSize(), 3)?>
+							</td>
+							<td align="right" class="log-file-size">
+								<?php if ($logFile->GetLinesCount() !== NULL): ?>
+									<?=$this->FormatNumber($logFile->GetLinesCount())?>
+								<?php else: ?>
+									unknown
+								<?php endif; ?>
+							</td>
+							<td class="log-processing" data-id="<?php
+								echo $logFile->GetIdGeneralLog();
+							?>">
+								<?php if ($logFile->GetProcessed() === \App\Models\LogFile::PROCESSED): ?>
+									Processed
+								<?php elseif ($logFile->GetProcessed() === \App\Models\LogFile::PROCESSING): ?>
+									Processing
+								<?php else: ?>
+									<form 
+										class="processing-start" 
+										action="<?=$url(':ProcessingStart')?>" 
+										method="post">
+										<input type="hidden" name="<?=$csrfName?>" value="<?=$csrfValue?>" />
+										<input type="hidden" name="hash" value="<?=$logFile->GetHash()?>" />
+										<input type="submit" value="Run Processing" />
+									</form>
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</tbody>
+		</table>
+		<input id="logs-processing-progresses-url" type="hidden" value="<?=$logsProcessingProgressesUrl?>" />
+	
+	<?php endif; ?>
+		
+	<p><i>To include general log files in the application, place them in the `<code><?=$dataDir?></code>` directory.</i></p>
+
+</div>

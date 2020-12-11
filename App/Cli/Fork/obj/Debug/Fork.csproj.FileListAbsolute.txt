@@ -1,0 +1,7 @@
+c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\bin\Debug\Fork.exe
+c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\bin\Debug\Fork.pdb
+c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\obj\Debug\Fork.csprojAssemblyReference.cache
+c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\obj\Debug\Fork.exe
+c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\obj\Debug\Fork.pdb
+c:\works\home\r-webdog\tec\mariadb-global-logs\Var\Cli\Fork.exe
+c:\works\home\r-webdog\tec\mariadb-global-logs\Var\Cli\Fork.pdb

@@ -1,0 +1,13 @@
+<?php /** @var $this \MvcCore\View */ ?>
+<?php /** @var $lines \string[] */ ?>
+
+<table class="editor">
+	<tbody>
+		<?php foreach ($lines as $number => $line): ?>
+			<tr<?php if ($number >= $lineBegin && $number <= $lineEnd) echo ' class="selected"'; ?>">
+				<th id="line-<?=$number?>"><?=$number?></th>
+				<td><code><pre><?php echo str_replace(["\t", ""],["&nbsp;&nbsp;&nbsp;", "&nbsp;"],$line); ?></pre></code></td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
