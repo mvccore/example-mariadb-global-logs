@@ -24,6 +24,7 @@
 	"require": {
 		"php": ">=5.4.0",
 		"mvccore/mvccore": "dev-master",
+		"mvccore/ext-model-db-mysql": "dev-master",
 		"mvccore/ext-form": "dev-master",
 		"mvccore/ext-debug-tracy": "dev-master",
 		"mvccore/ext-debug-tracy-mvccore": "dev-master",

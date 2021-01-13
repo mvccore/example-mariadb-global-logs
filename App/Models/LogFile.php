@@ -75,101 +75,98 @@ class LogFile extends \App\Models\Base
 	/** @return bool */
 	public function IsSavedInDatabase () {
 		$dbData = self::GetConnection()
-			->Prepare(implode("\n", [
+			->Prepare([
 				"SELECT					",
 				"	t.`id_general_log`,	",
 				"	t.`lines_count`,	",
 				"	t.`processed`		",
 				"FROM general_logs t	",
 				"WHERE t.hash = :hash;	",
-			]))
-			->Execute([':hash' => $this->hash])
-			->FetchOneToAssocArray();
-		if ($dbData !== NULL) {
-			$this->SetUp($dbData, self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, TRUE);
+			])
+			->FetchOne([':hash' => $this->hash])
+			->ToArray();
+		if ($dbData !== NULL) 
 			return TRUE;
-		}
 		return FALSE;
 	}
 
-	/** @return int|NULL */
-	public function Save () {
-		if ($this->idGeneralLog === NULL) {
-			return $this->idGeneralLog = $this->insert();
+	/** @return bool */
+	public function Save ($createNew = null, $flags = 0) {
+		if ($createNew || $this->idGeneralLog === NULL) {
+			return $this->Insert($flags);
 		} else {
-			return $this->update();
+			return $this->Update($flags);
 		}
 	}
 
-	/** @return int|NULL */
-	protected function insert () {
-		$result = NULL;
-		$db = self::GetConnection();
+	/** @return bool */
+	public function Insert ($flags = 0) {
+		$result = TRUE;
 		$this->created->setTimezone(new \DateTimeZone('UTC'));
+		$this->processed = self::NOT_PROCESSED;
+		$data = $this->GetValues(
+			self::PROPS_PROTECTED |
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+		);
+		$params = [];
+		$sqlItems = [];
+		foreach ($data as $columnName => $value) {
+			if ($columnName === 'id_general_log') continue;
+			$params[":{$columnName}"] = self::convertToScalar($value);
+			$sqlItems[] = "`{$columnName}`";
+		}
+		$db = self::GetConnection();
 		try {
-			$db->BeginTransaction('log_file_insert', TRUE);
-			$db->Prepare(implode("\n", [
+			$db->BeginTransaction(self::TRANS_READ_WRITE, 'log_file_insert');
+			$db
+				->Prepare([
 					"INSERT INTO `general_logs` (		",
-					"	file_name, hash, lines_count,	",
-					"	file_size, created, processed	",
+					implode(", ", $sqlItems),
 					") VALUES (							",
-					"	:file_name, :hash, :lines_count,",
-					"	:file_size, :created, :processed",
+					implode(", ", array_keys($params)),
 					");									",
-				]))
-				->Execute([
-					':file_name'	=> $this->fileName, 
-					':hash'			=> $this->hash, 
-					':lines_count'	=> $this->GetLinesCount(),
-					':file_size'	=> $this->fileSize, 
-					':created'		=> $this->created->format('Y-m-d H:i:s'), 
-					':processed'	=> self::NOT_PROCESSED
-				]);
-			$result = $db->LastInsertId('general_logs', 'int');
-			$this->initialValues['idGeneralLog'] = $result;
-			$this->initialValues['linesCount'] = $this->linesCount;
+				])
+				->Execute($params);
+			$this->idGeneralLog = $db->LastInsertId('general_logs', 'int');
 			$db->Commit();
+			$this->initialValues = array_merge([], $this->initialValues, [
+				'idGeneralLog'	=> $this->idGeneralLog,
+				'linesCount'	=> $this->linesCount,
+			]);
 		} catch (\Throwable $e) {
 			$db->RollBack();
 			\MvcCore\Debug::Exception($e);
-			$result = NULL;
+			$result = FALSE;
 		}
 		return $result;
 	}
 	
-	/** @return int */
-	protected function update () {
-		$touched = $this->GetTouched(FALSE, FALSE);
-		if (count($touched) === 0) return 0;
-		$colsSqlItems = [];
-		$params = [];
-		array_walk($touched, function ($value, $propKey) use (& $colsSqlItems, & $params) {
-			if (mb_substr($propKey, 0, 1) == '_' || $propKey === 'id_general_log') return;
-			$colName = \MvcCore\Tool::GetUnderscoredFromPascalCase($propKey);
-			$colsSqlItems[] = "{$colName} = :{$colName}";
-			if ($value instanceof \DateTime) {
-				$value->setTimezone(new \DateTimeZone('UTC'));
-				$scalarValue = $value->format('Y-m-d H:i:s');
-			} else {
-				$scalarValue = $value;
-			}
-			$params[":{$colName}"] = $scalarValue;
-		});
-		$colsSql = implode(", ", $colsSqlItems);
-		$params[':id_general_log'] = $this->idGeneralLog;
-		$updatedRows = self::GetConnection()
-			->Prepare(implode("\n", [
+	/** @return bool */
+	public function Update ($flags = 0) {
+		$data = $this->GetTouched(
+			self::PROPS_PROTECTED |
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+		);
+		if (count($data) === 0) 
+			return FALSE;
+		$params = [':id_general_log' => $this->idGeneralLog];
+		$colsSql = [];
+		foreach ($data as $columnName => $value) {
+			if ($columnName === 'id_general_log') continue;
+			$params[":{$columnName}"] = self::convertToScalar($value);
+			$colsSql[] = "`{$columnName}` = :{$columnName}";
+		};
+		$result = self::GetConnection()
+			->Prepare([
 				"UPDATE `general_logs`					",
-				"SET {$colsSql}							",
+				"SET " . implode(", ", $colsSql) . "	",
 				"WHERE									",
 				"	`id_general_log` = :id_general_log;	",
-			]))
+			])
 			->Execute($params)
-			->RowCount();
-		$this->initialValues = array_merge(
-			[], $this->initialValues, $touched
-		);
-		return $updatedRows;
+			->GetExecResult();
+		$this->initialValues = array_merge([], $this->initialValues, $data);
+		return $result;
 	}
 
 	/**
@@ -191,19 +188,19 @@ class LogFile extends \App\Models\Base
 	 * @return \App\Models\LogFile
 	 */
 	public static function GetById ($logFileId) {
-		$rawData = self::GetConnection()
+		return self::GetConnection()
 			->Prepare(implode("\n", [
 				"SELECT *									",
 				"FROM `general_logs`						",
 				"WHERE `id_general_log` = :id_general_log;	",
 			]))
-			->Execute([':id_general_log' => $logFileId])
-			->FetchOneToAssocArray();
-		if ($rawData === NULL) return NULL;
-		/** @var $result \App\Models\LogFile */
-		$result = (new static)
-			->SetUp($rawData, self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, TRUE);
-		return $result;
+			->FetchOne([':id_general_log' => $logFileId])
+			->ToInstance(
+				get_called_class(),
+				self::PROPS_PROTECTED |
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE |
+				self::PROPS_INITIAL_VALUES
+			);
 	}
 
 	/** @return \App\Models\LogFile[] */
@@ -214,7 +211,12 @@ class LogFile extends \App\Models\Base
 		$result = [];
 		foreach ($rawData as $rawItem)
 			$result[] = (new static)
-				->SetUp($rawItem, self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, TRUE);
+				->SetValues(
+					$rawItem, 
+					self::PROPS_PROTECTED |
+					self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE |
+					self::PROPS_INITIAL_VALUES
+				);
 		return $result;
 	}
 
@@ -234,15 +236,22 @@ class LogFile extends \App\Models\Base
 			if ($hashLocal !== $hash) continue;
 			$fileName = $item->getFilename();
 			$fullPath = $dataDirFullPath . '/' . $fileName;
-			$result = (new static)->SetUp([
-				'id_general_log'	=> NULL,
-				'file_name'			=> $fileName,
-				'hash'				=> $hash,
-				'lines_count'		=> NULL,
-				'file_size'			=> filesize($fullPath),
-				'created'			=> filectime($fullPath),
-				'processed'			=> self::NOT_PROCESSED,
-			], self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE);
+			$created = (new \DateTime())->setTimestamp(filectime($fullPath));
+			$result = (new static)
+				->SetValues([
+					'id_general_log'	=> NULL,
+					'file_name'			=> $fileName,
+					'hash'				=> $hash,
+					'lines_count'		=> NULL,
+					'file_size'			=> filesize($fullPath),
+					'created'			=> $created->format('Y-m-d H:i:s'),
+					'processed'			=> self::NOT_PROCESSED,
+				], (
+					self::PROPS_PROTECTED |
+					self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE |
+					self::PROPS_INITIAL_VALUES
+				)
+			);
 		}
 		return $result;
 	}
@@ -273,13 +282,13 @@ class LogFile extends \App\Models\Base
 	/** @return \App\Models\LogFile[] Keys are hash values */
 	protected static function listAllFromDb () {
 		return self::GetConnection()
-			->Prepare(implode("\n", [
+			->Prepare([
 				"SELECT *					",
 				"FROM `general_logs` gl		",
 				"ORDER BY `file_name` ASC;	",
-			]))
-			->Execute()
-			->FetchAllToAssocArrays('hash');
+			])
+			->FetchAll()
+			->ToArrays('hash');
 	}
 
 	protected static function getHashFromFile ($fullPath) {

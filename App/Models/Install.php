@@ -40,15 +40,15 @@ class Install extends Base
 			foreach ($cmds as $cmd) 
 				if (mb_strpos($cmd, 'CREATE TABLE ') !== FALSE)
 					$installScriptTablesCnt++;
-
-			$dbTablesCnt = self::GetConnection()
-				->Prepare(implode("\n", [
+			$dbCfg = \MvcCore\Config::GetSystem()->db;
+			$dbTablesCnt = self::GetConnection($dbCfg)
+				->Prepare([
 					"SELECT COUNT(*) AS `cnt`			",
 					"FROM information_schema.`TABLES` t	",
 					"WHERE t.`TABLE_SCHEMA` = :db_name;	",
-				]))
-				->Execute([':db_name' => self::GetConfig()->database])
-				->FetchColumn(0, 'int');
+				])
+				->FetchOne([':db_name' => $dbCfg->database])
+				->ToScalar('cnt', 'int');
 			
 			$result = $dbTablesCnt === $dbTablesCnt;
 		} catch (\Exception $e) {
@@ -114,7 +114,7 @@ class Install extends Base
 			"database without credentials from app config."
 		);
 		$cmds = $this->getDbInstallCommands();
-		$dbCfg = self::GetConfig();
+		$dbCfg = \MvcCore\Config::GetSystem()->db;
 		$dbName = $dbCfg->database;
 		$dbCfg->database = 'information_schema';
 		$db = self::GetConnection($dbCfg);

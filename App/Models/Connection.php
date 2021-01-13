@@ -280,12 +280,22 @@ class Connection extends \App\Models\Base {
 				$orderFieldDbKey = \MvcCore\Tool::GetUnderscoredFromPascalCase(
 					$orderField
 				);
-				self::$orderFields[$orderFieldDbKey] = str_replace('_',' ',$orderFieldDbKey);
+				self::$orderFields[$orderFieldDbKey] = str_replace(
+					'_',' ',$orderFieldDbKey
+				);
 			}
 		}
 		return self::$orderFields;
 	}
 
+	/**
+	 * @param int $idGeneralLog 
+	 * @param string $orderField 
+	 * @param string $direction 
+	 * @param int $offset 
+	 * @param int $limit 
+	 * @return \MvcCore\Ext\Models\Db\Readers\Streams\Iterator
+	 */
 	public static function GetList (
 		$idGeneralLog,
 		$orderField = 'connected', $direction = 'asc', 
@@ -395,30 +405,34 @@ class Connection extends \App\Models\Base {
 			"ORDER BY `{$orderField}` {$direction}						",
 			"LIMIT {$offset}, {$limit};									",
 		]);
-
 		return self::GetConnection()
 			->Prepare($sql)
-			->Execute($params)
-			->FetchAllToInstances(
+			->StreamAll($params)
+			->ToInstances(
 				get_called_class(),
-				self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, 
-				FALSE
+				self::PROPS_PROTECTED |
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE
 			);
 	}
 	
+	/**
+	 * @param int $idGeneralLog 
+	 * @param int $offset 
+	 * @param int $limit 
+	 * @return int
+	 */
 	public static function GetCount (
 		$idGeneralLog,
 		$offset = 0, $limit = 100
 	) {
-		$params = [':id_gen_log' => $idGeneralLog];
 		return self::GetConnection()
-			->Prepare(implode("\n", [
-				"SELECT	COUNT(c.`id_connection`) 		",
+			->Prepare([
+				"SELECT	COUNT(c.`id_connection`) AS cnt	",
 				"FROM `connections` c					",
 				"WHERE c.`id_general_log` = :id_gen_log;",
-			]))
-			->Execute($params)
-			->FetchColumn(0, 'int');
+			])
+			->FetchOne([':id_gen_log' => $idGeneralLog])
+			->ToScalar('cnt', 'int');
 	}
 
 	/**
@@ -440,100 +454,104 @@ class Connection extends \App\Models\Base {
 				"WHERE									",
 				"	c.`id_connection` = :id_conn;		",
 			]))
-			->Execute([':id_conn' => $idConnection])
-			->FetchOneToInstance(
+			->FetchOne([':id_conn' => $idConnection])
+			->ToInstance(
 				get_called_class(),
-				self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, 
-				TRUE
+				self::PROPS_PROTECTED |
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE |
+				self::PROPS_INITIAL_VALUES
 			);
 	}
 
 	/**
-	 * @return int
+	 * @return bool
 	 */
-	public function Save () {
-		if ($this->idConnection === NULL) {
-			return $this->idConnection = $this->insert();
+	public function Save ($createNew = NULL, $flags = 0) {
+		if ($createNew || $this->idConnection === NULL) {
+			return $this->Insert($flags);
 		} else {
-			return $this->update();
+			return $this->Update($flags);
 		}
 	}
-
-	/** @return int */
-	protected function update () {
-		$updatedRows = 0;
-		$touchedProperties = $this->GetTouched(FALSE, FALSE);
-		if (count($touchedProperties) === 0) return 0;
-		unset($touchedProperties['user'],$touchedProperties['database']);
-		$updateSetItems = [];
-		$params = [];
-		array_walk($touchedProperties, function ($value, $propKey) use (& $updateSetItems, & $params) {
-			if (mb_substr($propKey, 0, 1) === '_' || $propKey === 'idConnection') return;
-			$underScoreKey = \MvcCore\Tool::GetUnderscoredFromPascalCase($propKey);
-			$updateSetItems[] = "`{$underScoreKey}` = :{$underScoreKey}";
-			if ($value instanceof \DateTime) {
-				$value->setTimezone(new \DateTimeZone('UTC'));
-				$scalarValue = $value->format('Y-m-d H:i:s');
-			} else {
-				$scalarValue = $value;
-			}
-			$params[':' . $underScoreKey] = $scalarValue;
-		});
-		$params[':id'] = $this->idConnection;
-		$setSectionSql = implode(", ", $updateSetItems);
-		$updatedRows = self::GetConnection()
-			->Prepare(implode("\n", [
-				"UPDATE `connections`			",
-				"SET {$setSectionSql}			",
-				"WHERE `id_connection` = :id;	",
-			]))
-			->Execute($params)
-			->RowCount();
-		$this->initialValues = array_merge(
-			$this->initialValues, $touchedProperties
+	
+	/** @return bool */
+	public function Insert ($flags = 0) {
+		$result = TRUE;
+		$data = $this->GetValues(
+			self::PROPS_PROTECTED |
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
 		);
-		return $updatedRows;
-	}
+		unset($data['user'], $data['database']);
+		
+		$params = [];
+		$sqlItems = [];
+		foreach ($data as $columnName => $value) {
+			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'idConnection') continue;
+			$params[":{$columnName}"] = self::convertToScalar($value);
+			$sqlItems[] = "`{$columnName}`";
+		}
 
-	/** @return int|NULL */
-	protected function insert () {
-		$idConnection = NULL;
-		$touchedProperties = $this->GetTouched(FALSE, FALSE);
-		unset($touchedProperties['user'],$touchedProperties['database']);
-		$insertSqlColumns = [];
-		$insertSqlValues = [];
-		$insertParams = [];
-		array_walk($touchedProperties, function ($value, $propKey) use (& $insertSqlColumns, & $insertSqlValues, & $insertParams) {
-			if (mb_substr($propKey, 0, 1) === '_' || $propKey === 'idConnection') return;
-			$underScoreKey = \MvcCore\Tool::GetUnderscoredFromPascalCase($propKey);
-			$insertSqlColumns[] = "`{$underScoreKey}`";
-			$insertSqlValues[] = ":{$underScoreKey}";
-			if ($value instanceof \DateTime) {
-				$value->setTimezone(new \DateTimeZone('UTC'));
-				$scalarValue = $value->format('Y-m-d H:i:s');
-			} else {
-				$scalarValue = $value;
-			}
-			$insertParams[":{$underScoreKey}"] = $scalarValue;
-		});
-		$insertSql  = "INSERT INTO `connections` (" . implode(', ', $insertSqlColumns) . ") "
-					. "VALUES (" . implode(', ', $insertSqlValues) . ");";
 		$db = self::GetConnection();
 		try {
-			$db->BeginTransaction('connection_insert', TRUE);
-			$db
-				->Prepare($insertSql)
-				->Execute($insertParams);
-			$idConnection = $db->LastInsertId('connections', 'int');
+			$db->BeginTransaction(
+				self::TRANS_ISOLATION_REPEATABLE_READ |
+				self::TRANS_READ_WRITE,
+				'connection_insert'
+			);
+			$result = $db
+				->Prepare([
+					"INSERT INTO `connections` (		",
+					implode(', ', $sqlItems)."			",
+					") VALUES (							",
+					implode(",",array_keys($params))."	",
+					");									",
+				])
+				->Execute($params)
+				->GetExecResult();
+			$this->idConnection = $db->LastInsertId('connections', 'int');
 			$db->Commit();
-			$this->initialValues = array_merge($this->initialValues, [
-				'idConnection' => $idConnection,
+			$this->initialValues = array_merge([], $this->initialValues, [
+				'idConnection' => $this->idConnection,
 			]);
 		} catch (\Exception $e) {
 			if ($db->InTransaction()) $db->RollBack();
 			\MvcCore\Debug::Exception($e);
+			$result = FALSE;
 		}
-		return $idConnection;
+		return $result;
+	}
+
+	/** @return bool */
+	public function Update ($flags = 0) {
+		$data = $this->GetTouched(
+			self::PROPS_PROTECTED |
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+		);
+		unset($data['user'],$data['database']);
+		if (count($data) === 0) 
+			return FALSE;
+		
+		$params = [];
+		$colsSql = [];
+		foreach ($data as $columnName => $value) {
+			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'idConnection') continue;
+			$params[":{$columnName}"] = self::convertToScalar($value);
+			$colsSql[] = "`{$columnName}` = :{$columnName}";
+		};
+		$params[':id'] = $this->idConnection;
+
+		$result = self::GetConnection()
+			->Prepare([
+				"UPDATE `connections`			",
+				"SET " . implode(", ", $colsSql),
+				"WHERE `id_connection` = :id;	",
+			])
+			->Execute($params)
+			->GetExecResult();
+
+		$this->initialValues = array_merge([], $this->initialValues, $data);
+
+		return $result;
 	}
 
 	/** @return \App\Models\LogFile */
@@ -541,12 +559,13 @@ class Connection extends \App\Models\Base {
 		return \App\Models\LogFile::GetById($this->idGeneralLog);
 	}
 
-	public function GetGroupedQueries () {
-		$db = self::GetConnection();
-		$params = [':id_conn' => $this->idConnection];
+	/**
+	 * @return \MvcCore\Ext\Models\Db\Readers\Streams\Iterator
+	 */
+	public function GetQueriesStream () {
 		/** @var $rawQueries \App\Models\Query[] */
-		$rawQueries = $db
-			->Prepare(implode("\n", [
+		return self::GetConnection()
+			->Prepare([
 				"SELECT										",
 				"	q.*,									",
 				"	t.`query_type_name`						",
@@ -554,25 +573,16 @@ class Connection extends \App\Models\Base {
 				"LEFT JOIN `query_types` t ON				",
 				"	t.`id_query_type` = q.`id_query_type`	",
 				"WHERE	q.`id_connection` = :id_conn		",
-				"ORDER BY q.`id_query` ASC;					",
-			]))
-			->Execute($params)
-			->FetchAllToInstances(
-				\App\Models\Query::class,
-				self::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE,
-				FALSE
+				"ORDER BY									",
+				"	q.`id_query` ASC,						",
+				"	q.`request_number` ASC,					",
+				"	q.`executed` ASC;						",
+			])
+			->StreamAll([':id_conn' => $this->idConnection])
+			->ToInstances(
+				get_class(new \App\Models\Query),
+				self::PROPS_PROTECTED |
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE
 			);
-		$result = [];
-		foreach ($rawQueries as $rawQuery) {
-			$executed = $rawQuery->GetExecuted()->format('Y-m-d H:i:s');
-			$requestNum = $rawQuery->GetRequestNumber();
-			if (!isset($result[$executed]))
-				$result[$executed] = [];
-			if (!isset($result[$executed][$requestNum]))
-				$result[$executed][$requestNum] = [];
-			$items = & $result[$executed][$requestNum];
-			$items[] = $rawQuery;
-		}
-		return $result;
 	}
 }

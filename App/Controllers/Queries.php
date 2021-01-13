@@ -8,7 +8,7 @@ class Queries extends \App\Controllers\Base
 	protected $connection;
 	/** @var \App\Models\LogFile */
 	protected $generalLog;
-	/** @var \App\Models\Query[][][] */
+	/** @var \MvcCore\Ext\Models\Db\Readers\Streams\Iterator */
 	protected $queries;
 
 	public function IndexAction () {
@@ -18,7 +18,7 @@ class Queries extends \App\Controllers\Base
 			"Connection with id: `{$idConnection}` doesn't exist."
 		);
 		$this->generalLog = $this->connection->GetGeneralLog();
-		$this->queries = $this->connection->GetGroupedQueries();
+		$this->queriesStream = $this->connection->GetQueriesStream();
 		
 		$this->view->generalLog = $this->generalLog;
 		$this->view->connection = $this->connection;

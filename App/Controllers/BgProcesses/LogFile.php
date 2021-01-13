@@ -37,7 +37,9 @@ class LogFile extends \App\Controllers\BgProcesses\Base
 			? $sysCfg->ignore->users
 			: [];
 
-		$linesCount = \App\Models\LogFile::GetFileLinesCount($this->generalLog->GetFullPath());
+		$linesCount = \App\Models\LogFile::GetFileLinesCount(
+			$this->generalLog->GetFullPath()
+		);
 		$this->generalLog
 			->SetLinesCount($linesCount)
 			->SetProcessed(\App\Models\LogFile::PROCESSING)
@@ -66,14 +68,18 @@ class LogFile extends \App\Controllers\BgProcesses\Base
 				->SetFinished($now)
 				->Save();
 
-		} catch (\Throwable $e) {
-			$this->bgProcess
-				->SetResult(-1)
-				->SetMessage(
-					$e->getMessage() . PHP_EOL.PHP_EOL . $e->getTraceAsString()
-				)
-				->Save();
-			throw $e;
+		} catch (\Throwable $e1) {
+			try {
+				$this->bgProcess
+					->SetResult(-1)
+					->SetMessage(
+						$e->getMessage() . PHP_EOL.PHP_EOL . $e->getTraceAsString()
+					)
+					->Save();
+			} catch (\Throwable $e2) {
+				
+			}
+			throw $e1;
 		}
 	}
 

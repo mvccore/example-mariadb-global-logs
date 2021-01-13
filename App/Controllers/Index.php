@@ -28,7 +28,7 @@ class Index extends Base {
 
 		$form = $this->getListProcessingStartForm();
 		list($result) = $form->Submit();
-		if ($result !== \MvcCore\Ext\Forms\IForm::RESULT_ERRORS) {
+		if ($result !== \MvcCore\Ext\IForm::RESULT_ERRORS) {
 			try {
 				$hash = $this->GetParam('hash', 'a-zA-Z0-9');
 				/** @var $logFile \App\Models\LogFile */

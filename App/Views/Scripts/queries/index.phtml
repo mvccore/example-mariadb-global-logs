@@ -3,10 +3,8 @@
  * @var $this \MvcCore\View
  * @var $generalLog \App\Models\LogFile
  * @var $connection \App\Models\Connection
- * @var $allQueries \App\Models\Query[][][]
- * @var $requestQueries \App\Models\Query[][]
- * @var $queryCommands \App\Models\Query[]
- * @var $queryCommand \App\Models\Query
+ * @var $queriesStream \MvcCore\Ext\Models\Db\Readers\Streams\Iterator
+ * @var $query \App\Models\Query
  */
 ?>
 
@@ -32,68 +30,110 @@
 		<a class="expand-collapse-control" href="javascript:void(0);" onclick="handleExpandOrCollapseQueries(this);">
 			<span class="expand">Expand All</span>
 			<span class="collase">Collapse All</span>
-		</a>
-		<?php foreach ($queries as $dateTime => $requestQueries): ?>
-			<div class="request">
+		</a><?php
+
+			$queriesStream->rewind();
+			while ($queriesStream->valid()):
+
+				$execGroupQueries = [];
+				$executedDateTimeLast = NULL;
+				$executedTimeStampLast = NULL;
+				do {
+					$query = $queriesStream->current();
+					$executedDateTime = $query->GetExecuted();
+					$executedTimeStamp = $executedDateTime->getTimestamp();
+					if (
+						$executedTimeStampLast !== NULL && 
+						$executedTimeStamp !== $executedTimeStampLast
+					) break;
+
+					$requestNum = $query->GetRequestNumber();
+					if (!isset($execGroupQueries[$requestNum]))
+						$execGroupQueries[$requestNum] = [];
+					$execGroupQueries[$requestNum][] = $query;
+
+					$executedDateTimeLast = $executedDateTime;
+					$executedTimeStampLast = $executedTimeStamp;
+
+					$queriesStream->next();
+				} while ($queriesStream->valid());
+
+				$dateTime = $this->FormatDate($executedDateTimeLast);
+
+			?><div class="request">
 				<a class="expand-collapse-control" href="javascript:void(0);" onclick="handleExpandOrCollapseQueries(this);">
 					<span class="expand">Expand All</span>
 					<span class="collase">Collapse All</span>
 				</a>
 				<div class="date"><?=$dateTime?></div>
-				<div class="request-queries">
-					<?php foreach ($requestQueries as $requestNumber => $queryCommands): ?>
-						<?php
-							$groupedCommands = [];
-							$queryTypes = [];
-							foreach ($queryCommands as $commandNumber => $queryCommand) {
-								$groupedCommands[] = $queryCommand->GetQueryTextCompressed();
-								$queryTypes[] = 'query-type-' . $queryCommand->GetQueryTypeName();
-							}
-							$groupedCommand = implode(' ', $groupedCommands);
-							$groupedCommand = $this->Truncate($groupedCommand, 180);
-						?>
-						<div class="query <?php echo implode(" ", $queryTypes); ?>">
-							<div class="query-head">
-								<span class="query-head-count"><?=count($queryCommands)?></span>
-								<span class="query-head-datetime"><?=$dateTime?></span>
-								<span class="query-head-id"><?=$queryCommand->GetIdQuery()?></span>
-								<span class="query-head-text"><?=$groupedCommand?></span>
-							</div>
-							<div class="query-content hidden">
-								<a class="query-line" href="javascript:void(0);" onclick="editor(this,'<?php
-									$lineCaption = $queryCommand->GetSourceLineBegin() - 10 >= 0
-										? $queryCommand->GetSourceLineBegin() - 10
-										: $queryCommand->GetSourceLineBegin();
-									echo $url(
-										'Editor:Index', [
-											'idGeneralLog'	=> $generalLog->GetIdGeneralLog(),
-											'lineBegin'		=> $queryCommand->GetSourceLineBegin(),
-											'lineEnd'		=> $queryCommand->GetSourceLineEnd(),
-											'linesRange'	=> 1000,
-										]
-									) . '#line-' . $lineCaption;
-								?>');" target="_blank">source</a>
-								
-								<a class="query-copy" href="javascript:void(0);" onclick="copy(this,'query-<?php
-									echo $queryCommand->GetIdQuery();
-								?>');">copy</a>
-								
-								<div class="query-id">id: <?php echo $queryCommand->GetIdQuery()?></div>
-								
-								<div class="query-count">count: <?=count($queryCommands)?></div>
-								
-								<div class="query-datetime"><?=$dateTime?></div>
-								
-								<?php foreach ($queryCommands as $commandNumber => $queryCommand): ?>
-									<div class="query-command" id="query-<?=$queryCommand->GetIdQuery()?>"><?=$queryCommand->GetQueryTextFormatted()?></div>
-								<?php endforeach; ?>
+				<div class="request-content"><?php
+				
+				foreach ($execGroupQueries as $requestNum => $queryCommands): 
+					
+					$groupedCommands = [];
+					$queryTypes = [];
+					foreach ($queryCommands as $query) {
+						$groupedCommands[] = $query->GetQueryTextCompressed();
+						$queryTypes[] = 'query-type-' . $query->GetQueryTypeName();
+					}
+					$groupedCommand = implode(' ', $groupedCommands);
+					$groupedCommand = $this->Truncate($groupedCommand, 180);
+					
+					$queryCommandsCount = count($queryCommands);
+					$firstQuery = $queryCommands[0];
+					$lastQuery = $queryCommands[$queryCommandsCount - 1];
 
-							</div>
+					?><div class="request-queries <?php echo implode(" ", $queryTypes); ?>">
+						<div class="request-queries-head">
+							<span class="request-queries-head-count"><?=$queryCommandsCount?></span>
+							<span class="request-queries-head-datetime"><?=$dateTime?></span>
+							<span class="request-queries-head-id"><?=$requestNum?></span>
+							<span class="request-queries-head-text"><?=$groupedCommand?></span>
 						</div>
-					<?php endforeach; ?>
-				</div>
+						<div class="request-queries-content hidden">
+							<a class="request-queries-source" href="javascript:void(0);" onclick="editor(this,'<?php
+								$lineCaption = $firstQuery->GetSourceLineBegin() - 10 >= 0
+									? $firstQuery->GetSourceLineBegin() - 10
+									: $firstQuery->GetSourceLineBegin();
+								echo $url(
+									'Editor:Index', [
+										'idGeneralLog'	=> $generalLog->GetIdGeneralLog(),
+										'lineBegin'		=> $firstQuery->GetSourceLineBegin(),
+										'lineEnd'		=> $lastQuery->GetSourceLineEnd(),
+										'linesRange'	=> 1000,
+									]
+								) . '#line-' . $lineCaption;
+							?>');" target="_blank">source</a>
+								
+							<a 
+							   class="request-queries-copy" 
+							   href="javascript:void(0);" 
+							   onclick="copy(this,'queries-<?=$requestNum?>');">copy</a>
+								
+							<div class="request-id">id: <?=$requestNum?></div>
+								
+							<div class="request-queries-count">count: <?=$queryCommandsCount?></div>
+								
+							<div class="request-datetime"><?=$dateTime?></div>
+								
+							<div id="queries-<?=$requestNum?>">
+								<?php foreach ($queryCommands as $commandNumber => $queryCommand): ?>
+									<div class="query-command" id="query-<?=$queryCommand->GetIdQuery()?>"><?php
+										echo $queryCommand->GetQueryTextFormatted();
+									?></div>
+								<?php endforeach; ?>
+							</div>
+							
+						</div>
+					</div>
+
+				<?php endforeach; ?>
+
 			</div>
-		<?php endforeach; ?>
+		</div>
+		
+		<?php endwhile; ?>
+
 	</div>
 
 </div>

@@ -12,13 +12,13 @@ var expandOrCollapseQueries = function (control, expand) {
 	} else {
 		control.className = cls.replace(/ expanded/g,'');
 	}
-	control.parentElement.querySelectorAll('.request-queries .query').forEach(function (queryElm) {
+	control.parentElement.querySelectorAll('.request-content .request-queries').forEach(function (queryElm) {
 		expandOrCollapseQuery(queryElm, expand);
 	});
 };
 var expandOrCollapseQuery = function (currentElm, expand) {
-	var queryHeadElm = currentElm.querySelector('.query-head'),
-		queryContentElm = currentElm.querySelector('.query-content'),
+	var queryHeadElm = currentElm.querySelector('.request-queries-head'),
+		queryContentElm = currentElm.querySelector('.request-queries-content'),
 		headCls = queryHeadElm.className,
 		contentCls = queryContentElm.className;
 	if (expand) {
@@ -33,8 +33,8 @@ var editor = function (control, url) {
 	var target = control.getAttribute('target');
 	window.open(url, target || '_blank');
 };
-var copy = function (control, queryElmId) {
-	var querySrc = document.getElementById(queryElmId),
+var copy = function (control, requestElmId) {
+	var querySrc = document.getElementById(requestElmId),
 		copyInput = document.getElementById('requests-copy2clipboard');
 	copyInput.value = String(querySrc.textContent);
 	copyInput.select();
@@ -45,16 +45,16 @@ document.addEventListener('click', function (e) {
 		currentClassName = '',
 		success = false;
 	if (
-		currentElm.className == 'query-line' ||
-		currentElm.className == 'query-copy' ||
-		currentElm.className == 'query-id'
+		currentElm.className == 'request-queries-source' ||
+		currentElm.className == 'request-queries-copy' ||
+		currentElm.className == 'request-id'
 	) {
 		window.event = e;
 		return;
 	}
 	while (true) {
 		currentClassName = ' ' + String(currentElm.className) + ' ';
-		if (currentClassName.indexOf(" query ") != -1) {
+		if (currentClassName.indexOf(" request-queries ") != -1) {
 			success = true;
 			break;
 		}
@@ -64,7 +64,7 @@ document.addEventListener('click', function (e) {
 	if (!success) return;
 	expandOrCollapseQuery(
 		currentElm,
-		currentElm.querySelector('.query-content').className.indexOf('hidden') != -1
+		currentElm.querySelector('.request-queries-content').className.indexOf('hidden') != -1
 	);
 	e.preventDefault();
 	e.stopPropagation();

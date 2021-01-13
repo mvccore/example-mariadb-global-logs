@@ -200,9 +200,8 @@ class BgProcess extends \App\Models\Base
 	 * @return \App\Models\BgProcess|NULL
 	 */
 	public static function GetById ($id) {
-		$db = self::GetConnection();
-		$rawData = $db
-			->prepare(implode("\n", [
+		return self::GetConnection()
+			->Prepare([
 				"SELECT 							",
 				"	bgp.`id_bg_process` AS `id`,	",
 				"	bgp.`id_general_log`,			",
@@ -218,19 +217,17 @@ class BgProcess extends \App\Models\Base
 				"	bgp.`message`					",
 				"FROM `bg_processes` bgp			",
 				"WHERE bgp.`id_bg_process` = :id;	",
-			]))
-			->execute([
+			])
+			->FetchOne([
 				':id'	=> $id
 			])
-			->fetchOneToAssocArray();
-		if ($rawData === NULL) return NULL;
-		/** @var $bgProcess \App\Models\BgProcess */
-		$bgProcess = (new static())->SetUp(
-			$rawData, 
-			\MvcCore\IModel::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, 
-			TRUE
-		);
-		return $bgProcess;
+			->ToInstance(
+				get_called_class(),
+				self::PROPS_INHERIT |
+				self::PROPS_PROTECTED |
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE |
+				self::PROPS_INITIAL_VALUES
+			);
 	}
 	
 	/**
@@ -240,9 +237,7 @@ class BgProcess extends \App\Models\Base
 	 * @return \App\Models\BgProcess|NULL
 	 */
 	public static function GetByLogIdCtrlAndAction ($idGeneralLog, $controller, $action) {
-		$db = self::GetConnection();
-		$hash = self::_getHash($idGeneralLog, $controller, $action);
-		$rawData = $db
+		return self::GetConnection()
 			->Prepare(implode("\n", [
 				"SELECT 						",
 				"	bgp.`id_bg_process` AS `id`,",
@@ -261,18 +256,16 @@ class BgProcess extends \App\Models\Base
 				"WHERE							",
 				"	bgp.`hash` = :hash;			",
 			]))
-			->Execute([
-				':hash' => $hash,
+			->FetchOne([
+				':hash' => self::_getHash($idGeneralLog, $controller, $action),
 			])
-			->fetchOneToAssocArray();
-		if ($rawData === NULL) return NULL;
-		/** @var $bgProcess \App\Models\BgProcess */
-		$bgProcess = (new static())->SetUp(
-			$rawData, 
-			\MvcCore\IModel::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, 
-			TRUE
-		);
-		return $bgProcess;
+			->ToInstance(
+				get_called_class(),
+				self::PROPS_INHERIT |
+				self::PROPS_PROTECTED | 
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE |
+				self::PROPS_INITIAL_VALUES
+			);
 	}
 
 	/**
@@ -282,12 +275,11 @@ class BgProcess extends \App\Models\Base
 	 * @return \App\Models\BgProcess[] Keys are general log ids.
 	 */
 	public static function GetByLogsIdsCtrlAndAction ($generalLogsIds, $controller, $action) {
-		$db = self::GetConnection();
 		$hashes = [];
 		foreach ($generalLogsIds as $generalLogId)
 			$hashes[] = self::_getHash(intval($generalLogId), $controller, $action);
 		$hashesStr = implode("','", $hashes);
-		$rawData = $db
+		return self::GetConnection()
 			->Prepare(implode("\n", [
 				"SELECT 							",
 				"	bgp.`id_bg_process` AS `id`,	",
@@ -306,147 +298,141 @@ class BgProcess extends \App\Models\Base
 				"WHERE								",
 				"	bgp.`hash` IN ('{$hashesStr}');	",
 			]))
-			->Execute()
-			->FetchAllToAssocArrays('id_general_log');
-		if (!$rawData) return [];
-		$result = [];
-		foreach ($rawData as $rawItem) {
-			/** @var $item \App\Models\BgProcess */
-			$item = (new static())->SetUp(
-				$rawItem, 
-				\MvcCore\IModel::KEYS_CONVERSION_UNDERSCORES_TO_CAMELCASE, 
-				TRUE
+			->FetchAll()
+			->ToInstances(
+				get_called_class(),
+				self::PROPS_INHERIT |
+				self::PROPS_PROTECTED |
+				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE,
+				'id_general_log',
+				'int'
 			);
-			$result[$item->GetIdGeneralLog()] = $item;
-		}
-		return $result;
 	}
 
 	/**
-	 * @return int
+	 * @return bool
 	 */
-	public function Save () {
-		if ($this->id === NULL) {
-			return $this->id = $this->insert();
+	public function Save ($createNew = null, $flags = 0) {
+		if ($createNew || $this->id === NULL) {
+			return $this->Insert($flags);
 		} else {
-			return $this->update();
+			return $this->Update($flags);
 		}
 	}
 
-	/** @return int */
-	protected function update () {
-		$updatedRows = 0;
-		$touchedProperties = $this->GetTouched(TRUE, FALSE);
-		$updateSetItems = [];
-		$params = [];
-		array_walk($touchedProperties, function ($value, $propKey) use (& $updateSetItems, & $params) {
-			if (mb_substr($propKey, 0, 1) === '_' || $propKey === 'id') return;
-			$underScoreKey = \MvcCore\Tool::GetUnderscoredFromPascalCase($propKey);
-			$updateSetItems[] = "`{$underScoreKey}` = :{$underScoreKey}";
-			if ($value instanceof \DateTime) {
-				$value->setTimezone(new \DateTimeZone('UTC'));
-				$scalarValue = $value->format('Y-m-d H:i:s');
-			} else if ($propKey == 'progress') {
-				$scalarValue = number_format($value, 2, '.', '');
-			} else {
-				$scalarValue = $value;
-			}
-			$params[':' . $underScoreKey] = $scalarValue;
-		});
-		$params[':id'] = $this->id;
-		$setSectionSql = implode(", ", $updateSetItems);
-		$updatedRows = self::GetConnection()
-			->Prepare(implode("\n", [
-				"UPDATE `bg_processes`			",
-				"SET {$setSectionSql}			",
-				"WHERE `id_bg_process` = :id;	",
-			]))
-			->Execute($params)
-			->RowCount();
-		$this->initialValues = array_merge(
-			$this->initialValues, $touchedProperties
-		);
-		return $updatedRows;
-	}
-
-	/** @return int|NULL */
-	protected function insert () {
-		$idBgProcess = NULL;
+	/** @return bool */
+	public function Insert ($flags = 0) {
+		$result = TRUE;
 		$this->hash = self::_getHash($this->idGeneralLog, $this->controller, $this->action);
-		$touchedProperties = $this->GetTouched(TRUE, FALSE);
-		$insertSqlColumns = [];
-		$insertSqlValues = [];
-		$insertParams = [];
-		array_walk($touchedProperties, function ($value, $propKey) use (& $insertSqlColumns, & $insertSqlValues, & $insertParams) {
-			if (mb_substr($propKey, 0, 1) === '_' || $propKey === 'id') return;
-			$underScoreKey = \MvcCore\Tool::GetUnderscoredFromPascalCase($propKey);
-			$insertSqlColumns[] = "`{$underScoreKey}`";
-			$insertSqlValues[] = ":{$underScoreKey}";
-			if ($value instanceof \DateTime) {
-				$value->setTimezone(new \DateTimeZone('UTC'));
-				$scalarValue = $value->format('Y-m-d H:i:s');
-			} else if ($propKey == 'progress') {
+		
+		$data = $this->GetValues(
+			self::PROPS_INHERIT |
+			self::PROPS_PROTECTED |
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+		);
+
+		$params = [];
+		$sqlItems = [];
+		foreach ($data as $columnName => $value) {
+			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'id') continue;
+			if ($columnName == 'progress') {
 				$scalarValue = number_format($value, 2, '.', '');
 			} else {
-				$scalarValue = $value;
+				$scalarValue = self::convertToScalar($value);
 			}
-			$insertParams[":{$underScoreKey}"] = $scalarValue;
-		});
-		$insertSql  = "INSERT INTO `bg_processes` (" . implode(', ', $insertSqlColumns) . ") "
-					. "VALUES (" . implode(', ', $insertSqlValues) . ");";
+			$params[":{$columnName}"] = $scalarValue;
+			$sqlItems[] = "`{$columnName}`";
+		}
+
 		$db = self::GetConnection();
 		try {
-			$db->BeginTransaction('bg_process_insert', TRUE);
-			$db
-				->Prepare($insertSql)
-				->Execute($insertParams);
-			$idBgProcess = $db->LastInsertId('bg_processes', 'int');
+			$db->BeginTransaction(
+				self::TRANS_ISOLATION_REPEATABLE_READ |
+				self::TRANS_READ_WRITE,
+				'bg_process_insert'
+			);
+			$result = $db
+				->Prepare([
+					"INSERT INTO `bg_processes`	(		",
+					implode(",",$sqlItems)."			",
+					") VALUES (							",
+					implode(",",array_keys($params))."	",
+					");									",
+				])
+				->Execute($params)
+				->GetExecResult();
+			$this->id = $db->LastInsertId('bg_processes', 'int');
 			$db->Commit();
 			$createdRawValue = $db
-				->Prepare(implode("\n", [
+				->Prepare([
 					"SELECT `created`				",
 					"FROM `bg_processes`		",
 					"WHERE `id_bg_process` = :id;	",
-				]))
-				->Execute([ ':id'	=> $idBgProcess ])
-				->FetchOneToScalar('created');
-			list($converted, $createdDateTime) = static::convertToType($createdRawValue, 'DateTime');
-			if ($converted) $this->created = $createdDateTime;
-			$this->initialValues = array_merge($this->initialValues, [
-				'id'		=> $idBgProcess,
+				])
+				->FetchOne([':id'	=> $this->id])
+				->ToScalar('created');
+			$createdDateTime = static::parseToDateTime($createdRawValue, ['Y-m-d H:i:s', 'UTC']);
+			if ($createdDateTime !== FALSE) 
+				$this->created = $createdDateTime;
+			$this->initialValues = array_merge([], $this->initialValues, [
+				'id'		=> $this->id,
 				'created'	=> $this->created,
 				'hash'		=> $this->hash,
 			]);
 		} catch (\Exception $e) {
 			if ($db->InTransaction()) $db->RollBack();
 			\MvcCore\Debug::Exception($e);
+			$result = FALSE;
 		}
-		return $idBgProcess;
+		return $result;
+	}
+	
+	/** @return bool */
+	public function Update ($flags = 0) {
+		$data = $this->GetTouched(
+			self::PROPS_INHERIT |
+			self::PROPS_PROTECTED |
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+		);
+		if (count($data) === 0) 
+			return FALSE;
+
+		$params = [];
+		$colsSql = [];
+		foreach ($data as $columnName => $value) {
+			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'id') continue;
+			$params[":{$columnName}"] = self::convertToScalar($value);
+			$colsSql[] = "`{$columnName}` = :{$columnName}";
+		};
+		$params[':id'] = $this->id;
+
+		$result = self::GetConnection()
+			->Prepare([
+				"UPDATE `bg_processes`			",
+				"SET " . implode(", ", $colsSql),
+				"WHERE `id_bg_process` = :id;	",
+			])
+			->Execute($params)
+			->GetExecResult();
+
+		$this->initialValues = array_merge([], $this->initialValues, $data);
+
+		return $result;
 	}
 
 	/**
-	 * @return int
+	 * @return bool
 	 */
-	public function Delete () {
-		$deletedRows = 0;
-		$db = self::GetConnection();
-		try {
-			$db->BeginTransaction('bg_process_delete', TRUE);
-			$deletedRows = $db
-				->Prepare(implode("\n", [
-					"DELETE FROM `bg_processes`			",
-					"WHERE `id_bg_process` = :id_bg_process;",
-				]))
-				->Execute([
-					":id_bg_process"	=> $this->id,
-				])
-				->RowCount();
-			$db->Commit();
-		} catch (\Exception $e) {
-			$db->RollBack();
-			\MvcCore\Debug::Exception($e);
-		}
-		return $deletedRows;
+	public function Delete ($flags = 0) {
+		return self::GetConnection()
+			->Prepare([
+				"DELETE FROM `bg_processes`			",
+				"WHERE `id_bg_process` = :id_bg_process;",
+			])
+			->Execute([
+				":id_bg_process"	=> $this->id,
+			])
+			->GetExecResult();
 	}
 
 	/**

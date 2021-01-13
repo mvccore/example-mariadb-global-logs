@@ -66,9 +66,9 @@ class Processing extends \App\Models\Base
 				"ORDER BY				",
 				"	d.`id_database` ASC;",
 			]))
-			->Execute()
-			->FetchAllToScalars(
-				'database_name', 'id_database', NULL, 'int'
+			->FetchAll()
+			->ToScalars(
+				'database_name', NULL, 'id_database', 'int'
 			);
 		$this->users = $db
 			->Prepare(implode("\n", [
@@ -79,9 +79,9 @@ class Processing extends \App\Models\Base
 				"ORDER BY			",
 				"	u.`id_user` ASC;",
 			]))
-			->Execute()
-			->FetchAllToScalars(
-				'user_name', 'id_user', NULL, 'int'
+			->FetchAll()
+			->ToScalars(
+				'user_name', NULL, 'id_user', 'int'
 			);
 		$this->queryTypes = $db
 			->Prepare(implode("\n", [
@@ -92,9 +92,9 @@ class Processing extends \App\Models\Base
 				"ORDER BY					",
 				"	qt.`id_query_type` ASC;	",
 			]))
-			->Execute()
-			->FetchAllToScalars(
-				'query_type_name', 'id_query_type', NULL, 'int'
+			->FetchAll()
+			->ToScalars(
+				'query_type_name', NULL, 'id_query_type', 'int'
 			);
 	}
 
@@ -123,11 +123,12 @@ class Processing extends \App\Models\Base
 			: NULL;
 		$db = self::GetConnection();
 		$db->BeginTransaction(
-			'connection_insert', TRUE,
-			\MvcCore\Ext\DbConnection::ISOLATION_LEVEL_REPEATABLE_READ
+			self::TRANS_ISOLATION_REPEATABLE_READ |
+			self::TRANS_READ_WRITE,
+			'connection_insert'
 		);
 		$db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"INSERT INTO `connections` (	",
 				"	`id_general_log`, `id_user`,",
 				"	`id_database`, `id_thread`,	",
@@ -137,7 +138,7 @@ class Processing extends \App\Models\Base
 				"	:id_database, :id_thread,	",
 				"	:connected					",
 				");								",
-			]))
+			])
 			->Execute([
 				":id_general_log"	=> $this->idGeneralLog,
 				":id_user"			=> $idUser,
@@ -230,7 +231,7 @@ class Processing extends \App\Models\Base
 			$db
 				->Prepare(implode("\n", $countsUpdatesSql))
 				->Execute($countsUpdatesParams)
-				->RowCount();
+				->GetRowsCount();
 		}
 
 		// Update connection table with possible disconnections:
@@ -247,9 +248,9 @@ class Processing extends \App\Models\Base
 				$disConnUpdatesParams[":id_conn{$i}"] = $connId;
 			}
 			$db
-				->Prepare(implode("\n", $disConnUpdatesSql))
+				->Prepare($disConnUpdatesSql)
 				->Execute($disConnUpdatesParams)
-				->RowCount();
+				->GetRowsCount();
 		}
 
 		// Insert new qieries:
@@ -284,25 +285,24 @@ class Processing extends \App\Models\Base
 				$insertQueriesParams[":query_text{$i}"]			= $queryStr;
 			}
 			$db
-				->Prepare(implode("\n", $insertQueriesSql))
+				->Prepare($insertQueriesSql)
 				->Execute($insertQueriesParams)
-				->RowCount();
+				->GetRowsCount();
 		}
 
 		// Update progress:
 		$progress = floatval($this->currentLine) / floatval($this->linesCount) * 100.0;
 		$db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"UPDATE `bg_processes`		",
 				"SET `progress` = :val		",
 				"WHERE `id_bg_process` = :id;",
-
-			]))
+			])
 			->Execute([
 				':val'	=> number_format($progress, 6, '.', ''),
 				':id'	=> $this->bgProcessId,
 			])
-			->RowCount();
+			->GetRowsCount();
 
 		$this->connIds2UpdateCounts = [];
 		$this->connIds2UpdateDisconns = [];
@@ -319,14 +319,15 @@ class Processing extends \App\Models\Base
 			return $this->users[$user];
 		$db = self::GetConnection();
 		$db->BeginTransaction(
-			'user_insert', TRUE, 
-			\MvcCore\Ext\DbConnection::ISOLATION_LEVEL_SERIALIZABLE
+			self::TRANS_ISOLATION_SERIALIZABLE |
+			self::TRANS_READ_WRITE,
+			'user_insert'
 		);
 		$db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"INSERT INTO `users` (`user_name`)	",
 				"VALUES (:user_name);				",
-			]))
+			])
 			->Execute([':user_name' => $user]);
 		$idUser = $db->LastInsertId('users', 'int');
 		$db->Commit();
@@ -343,14 +344,15 @@ class Processing extends \App\Models\Base
 			return $this->databases[$database];
 		$db = self::GetConnection();
 		$db->BeginTransaction(
-			'database_insert', TRUE, 
-			\MvcCore\Ext\DbConnection::ISOLATION_LEVEL_SERIALIZABLE
+			self::TRANS_ISOLATION_SERIALIZABLE |
+			self::TRANS_READ_WRITE,
+			'database_insert'
 		);
 		$db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"INSERT INTO `databases` (`database_name`)	",
 				"VALUES (:database_name);					",
-			]))
+			])
 			->Execute([':database_name' => $database]);
 		$idDatabase = $db->LastInsertId('databases', 'int');
 		$db->Commit();
@@ -367,14 +369,15 @@ class Processing extends \App\Models\Base
 			return $this->queryTypes[$queryType];
 		$db = self::GetConnection();
 		$db->BeginTransaction(
-			'query_type_insert', TRUE,
-			\MvcCore\Ext\DbConnection::ISOLATION_LEVEL_SERIALIZABLE
+			self::TRANS_ISOLATION_SERIALIZABLE |
+			self::TRANS_READ_WRITE,
+			'query_type_insert'
 		);
 		$db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"INSERT INTO `query_types` (`query_type_name`)	",
 				"VALUES (:query_type_name);						",
-			]))
+			])
 			->Execute([':query_type_name' => $queryType]);
 		$idQueryType = $db->LastInsertId('query_types', 'int');
 		$db->Commit();

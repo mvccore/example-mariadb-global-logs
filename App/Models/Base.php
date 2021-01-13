@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-class Base extends \MvcCore\Model {
+class Base extends \MvcCore\Ext\Models\Db\Models\MySql {
+
 	private static $_appRoot = NULL;
 	private static $_sysCfgRelPath = '/mysql_global_logs.ini';
 	private static $_cliDir = '/Var/Cli';
 	private static $_dataDir = '/Data';
 	private static $_cacheDir = '/Var/Cache';
 
-	/** @return \MvcCore\Ext\DbConnection */
+	/** @return \MvcCore\Ext\Models\Db\Connection */
 	public static function GetConnection ($connectionNameOrConfig = NULL, $strict = true) {
-		/** @var $conn \MvcCore\Ext\DbConnection */
-		$conn = parent::GetConnection($connectionNameOrConfig, $strict);
+		/** @var $conn \MvcCore\Ext\Models\Db\Connection */
+		$conn = parent::GetConnection(0, $strict);
 		return $conn;
 	}
 

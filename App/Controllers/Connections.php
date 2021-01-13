@@ -23,13 +23,13 @@ class Connections extends \App\Controllers\Base
 
 	public function IndexAction () {
 		$this->completeParams();
+		$this->totalCount = \App\Models\Connection::GetCount(
+			$this->generalLog->GetIdGeneralLog(), 
+			$this->offset, $this->limit
+		);
 		$this->connections = \App\Models\Connection::GetList(
 			$this->generalLog->GetIdGeneralLog(), 
 			$this->orderField, $this->direction, 
-			$this->offset, $this->limit
-		);
-		$this->totalCount = \App\Models\Connection::GetCount(
-			$this->generalLog->GetIdGeneralLog(), 
 			$this->offset, $this->limit
 		);
 		$this->setUpViewProps();
