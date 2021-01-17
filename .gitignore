@@ -64,3 +64,5 @@ composer.dev.json
 *.phpproj
 *.phpproj.user
 Data/*
+mysql_global_logs.ini
+Var/Cli/*
