@@ -31,7 +31,7 @@ class Dispatcher extends \App\Controllers\Base
 		if ($errorMsg !== NULL) {
 			try {
 				throw new \Exception($errorMsg);
-			} catch (\Exception $e) {
+			} catch (\Throwable $e) {
 				\MvcCore\Debug::Log($e);
 			}
 			$this->Terminate();
@@ -67,7 +67,7 @@ class Dispatcher extends \App\Controllers\Base
 
 			unset($this->execController);
 
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$ctrlSerialized = serialize($this->execController);
 			$date = date('y-m-d_H-i-s_v', time());
 			$dumpFullPath = $this->request->GetAppRoot().'/Var/Logs/exec_ctrl_'.$date.'.dump';

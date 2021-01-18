@@ -379,7 +379,7 @@ class BgProcess extends \App\Models\Base
 				'created'	=> $this->created,
 				'hash'		=> $this->hash,
 			]);
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			if ($db->InTransaction()) $db->RollBack();
 			\MvcCore\Debug::Exception($e);
 			$result = FALSE;

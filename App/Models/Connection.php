@@ -513,7 +513,7 @@ class Connection extends \App\Models\Base {
 			$this->initialValues = array_merge([], $this->initialValues, [
 				'idConnection' => $this->idConnection,
 			]);
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			if ($db->InTransaction()) $db->RollBack();
 			\MvcCore\Debug::Exception($e);
 			$result = FALSE;

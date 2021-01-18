@@ -51,7 +51,7 @@ class Install extends Base
 				->ToScalar('cnt', 'int');
 			
 			$result = $dbTablesCnt === $dbTablesCnt;
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$result = FALSE;
 		}
 		return $result;
@@ -126,7 +126,7 @@ class Install extends Base
 			} catch (\Throwable $e) {
 				try {
 					throw new \Exception($cmd);
-				} catch (\Exception $prev) {
+				} catch (\Throwable $prev) {
 					throw new \Exception(
 						"Database install command failure: `{$e->getMessage()}`",
 						$e->getCode(),

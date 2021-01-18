@@ -20,7 +20,7 @@ class Install extends \App\Controllers\Base
 		if (!$this->installModel->IsConfigInstalled()) {
 			try {
 				$this->view->configInstalledAfter = $this->installModel->InstallConfig();
-			} catch (\Exception $e) {
+			} catch (\Throwable $e) {
 				$this->view->configInstallErrorMsg = $e->getMessage();
 				$this->view->configInstallStack = $e->getTraceAsString();
 				$this->view->configInstalledAfter = FALSE;
@@ -29,7 +29,7 @@ class Install extends \App\Controllers\Base
 		if (!$this->installModel->IsDataDirInstalled()) {
 			try {
 				$this->view->dataInstalledAfter = $this->installModel->InstallDataDir();
-			} catch (\Exception $e) {
+			} catch (\Throwable $e) {
 				$this->view->dataInstallErrorMsg = $e->getMessage();
 				$this->view->dataInstallStack = $e->getTraceAsString();
 				$this->view->dataInstalledAfter = FALSE;
@@ -38,7 +38,7 @@ class Install extends \App\Controllers\Base
 		if (!$this->installModel->IsCliDirInstalled()) {
 			try {
 				$this->view->cliInstalledAfter = $this->installModel->InstallCliDir();
-			} catch (\Exception $e) {
+			} catch (\Throwable $e) {
 				$this->view->cliInstallErrorMsg = $e->getMessage();
 				$this->view->cliInstallStack = $e->getTraceAsString();
 				$this->view->cliInstalledAfter = FALSE;
@@ -47,7 +47,7 @@ class Install extends \App\Controllers\Base
 		if (!$this->installModel->IsDbInstalled()) {
 			try {
 				$this->view->dbInstalledAfter = $this->installModel->InstallDb();
-			} catch (\Exception $e) {
+			} catch (\Throwable $e) {
 				$this->view->dbInstallErrorMsg = $e->getMessage();
 				$this->view->dbInstallCmd = $e->getPrevious() ? $e->getPrevious()->getMessage() : NULL;
 				$this->view->dbInstallStack = $e->getTraceAsString();
