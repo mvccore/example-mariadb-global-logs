@@ -27,7 +27,7 @@ class LogFile extends \App\Controllers\BgProcesses\Base
 	protected $srcLineNum = 0;
 
 	/**
-	 * @see http://r-webdog.czx/tec/mariadb-global-logs/?controller=bg-processes/dispatcher&action=execute&id_bg_process=1
+	 * @see ?controller=bg-processes/dispatcher&action=execute&id_bg_process=1
 	 */
 	public function IndexAction () {
 		$this->generalLog = $this->bgProcess->GetGeneralLog();
@@ -73,7 +73,7 @@ class LogFile extends \App\Controllers\BgProcesses\Base
 				$this->bgProcess
 					->SetResult(-1)
 					->SetMessage(
-						$e->getMessage() . PHP_EOL.PHP_EOL . $e->getTraceAsString()
+						$e1->getMessage() . PHP_EOL.PHP_EOL . $e->getTraceAsString()
 					)
 					->Save();
 			} catch (\Throwable $e2) {
