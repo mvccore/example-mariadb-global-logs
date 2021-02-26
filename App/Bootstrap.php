@@ -23,16 +23,19 @@ class Bootstrap {
 
 		// Set up application routes with custom names:
 		
-		/*\MvcCore\Router::GetInstance([
+		\MvcCore\Router::GetInstance([
 			'Index:Index'		=> [
 				'match'			=> "#^/(index.php)?$#",
 				'reverse'		=> '/',
 			],
 			'Install:Index'		=> "/install",
-			'Connections:Index'	=> "/connections/log-<id_general_log>[/page-<page>]",
+			'Connections:Index'	=> [
+				'pattern'		=> "/connections/log-<id_general_log>[/<grid>]",
+				'constraints'	=> ['grid' => '.*'],
+			],
 			'Queries:Index'		=> "/queries/connection-<id_connection>",
 			'Editor:Index'		=> "/editor/log-<idGeneralLog>/<lineBegin>/<lineEnd>[/<linesRange>]",
-		])->SetTrailingSlashBehaviour(-1);*/
+		])->SetTrailingSlashBehaviour(-1);
 		
 
 		return $app;

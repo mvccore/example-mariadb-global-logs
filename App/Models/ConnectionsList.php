@@ -52,7 +52,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 	}
 
 	protected function completeSqlAndParamsCount () {
-		list($sqlConditions, $params) = $this->completeSqlConditionsAndParams();
+		list($sqlConditions, $params) = $this->completeSqlConditionsAndParams(1);
 		$sql = [
 			"SELECT COUNT(								",
 			"	c.`id_connection`						",
@@ -74,16 +74,6 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 	}
 
 	protected function completeSqlAndParamsPageData () {
-		list($sqlConditions, $params) = $this->completeSqlConditionsAndParams(TRUE);
-		
-		// ordering:
-		$orderSqlItems = [];
-		foreach ($this->ordering as $columnName => $direction)
-			$orderSqlItems[] = "`{$columnName}` {$direction}";
-		$orderSql = count($orderSqlItems) > 0
-			? " ORDER BY " . implode(", ", $orderSqlItems) . " "
-			: "";
-
 		$queryTypes = self::GetConnection()
 			->Prepare([
 				"SELECT 						",
@@ -102,18 +92,41 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 				'query_type_name', 'string'
 			);
 		
+		list($sqlConditions, $params) = $this->completeSqlConditionsAndParams(
+			1 + count($queryTypes)
+		);
+
+		// ordering:
+		$orderSqlItems = [];
+		foreach ($this->ordering as $columnName => $direction)
+			$orderSqlItems[] = "`{$columnName}` {$direction}";
+		$orderSql = count($orderSqlItems) > 0
+			? " ORDER BY " . implode(", ", $orderSqlItems) . " "
+			: "";
+
+		
 		// offset and limit:
 		$limitSql = " LIMIT {$this->offset}, {$this->limit} ";
+
+		$selects = isset($queryTypes['select']);
+		$inserts = isset($queryTypes['insert']);
+		$updates = isset($queryTypes['update']);
+		$deletes = isset($queryTypes['delete']);
+		
+		$selectsColumnSql = $selects ? "IFNULL(selects.`selects_count`, 0)" : "0" ;
+		$insertsColumnSql = $inserts ? "IFNULL(inserts.`inserts_count`, 0)" : "0" ;
+		$updatesColumnSql = $updates ? "IFNULL(updates.`updates_count`, 0)" : "0" ;
+		$deletesColumnSql = $deletes ? "IFNULL(deletes.`deletes_count`, 0)" : "0" ;
 
 		$sql = [
 			"SELECT														",
 			"	c.*,													",
 			"	d.`database_name` AS `database`,						",
 			"	u.`user_name` AS `user`,								",
-			"	IFNULL(selects.`selects_count`, 0) AS `selects_count`,	",
-			"	IFNULL(inserts.`inserts_count`, 0) AS `inserts_count`,	",
-			"	IFNULL(updates.`updates_count`, 0) AS `updates_count`,	",
-			"	IFNULL(deletes.`deletes_count`, 0) AS `deletes_count`	",
+			"	{$selectsColumnSql} AS `selects_count`,					",
+			"	{$insertsColumnSql} AS `inserts_count`,					",
+			"	{$updatesColumnSql} AS `updates_count`,					",
+			"	{$deletesColumnSql} AS `deletes_count`					",
 
 			"FROM `connections` c										",
 
@@ -121,85 +134,108 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 			"	d.`id_database` = c.`id_database`						",
 			"LEFT JOIN `users` u ON										",
 			"	u.`id_user` = c.`id_user`								",
-			
-			"LEFT JOIN (												",
-			"	SELECT 													",
-			"		q.`id_connection`,									",
-			"		COUNT(q.`id_query_type`) AS `selects_count`			",
-			"	FROM `queries` q										",
-			"	JOIN (													",
-			"		SELECT c.`id_connection`							",
-			"		FROM `connections` c								",
-			"		{$sqlConditions[0]} {$orderSql} {$limitSql}			",
-			"	) conns ON												",
-			"		conns.`id_connection` = q.`id_connection` AND		",
-			"		q.`id_query_type` = ".$queryTypes['select']."		",
-			"	GROUP BY												",
-			"		q.`id_connection`									",
-			") selects ON												",
-			"	selects.`id_connection` = c.`id_connection`				",
-			
-			"LEFT JOIN (												",
-			"	SELECT 													",
-			"		q.`id_connection`,									",
-			"		COUNT(q.`id_query_type`) AS `inserts_count`			",
-			"	FROM `queries` q										",
-			"	JOIN (													",
-			"		SELECT c.`id_connection`							",
-			"		FROM `connections` c								",
-			"		{$sqlConditions[1]} {$orderSql} {$limitSql}			",
-			"	) conns ON												",
-			"		conns.`id_connection` = q.`id_connection` AND		",
-			"		q.`id_query_type` = ".$queryTypes['insert']."		",
-			"	GROUP BY												",
-			"		q.`id_connection`									",
-			") inserts ON												",
-			"	inserts.`id_connection` = c.`id_connection`				",
-			
-			"LEFT JOIN (												",
-			"	SELECT 													",
-			"		q.`id_connection`,									",
-			"		COUNT(q.`id_query_type`) AS `updates_count`			",
-			"	FROM `queries` q										",
-			"	JOIN (													",
-			"		SELECT c.`id_connection`							",
-			"		FROM `connections` c								",
-			"		{$sqlConditions[2]} {$orderSql} {$limitSql}			",
-			"	) conns ON												",
-			"		conns.`id_connection` = q.`id_connection` AND		",
-			"		q.`id_query_type` = ".$queryTypes['update']."		",
-			"	GROUP BY												",
-			"		q.`id_connection`									",
-			") updates ON												",
-			"	updates.`id_connection` = c.`id_connection`				",
-			
-			"LEFT JOIN (												",
-			"	SELECT 													",
-			"		q.`id_connection`,									",
-			"		COUNT(q.`id_query_type`) AS `deletes_count`			",
-			"	FROM `queries` q										",
-			"	JOIN (													",
-			"		SELECT c.`id_connection`							",
-			"		FROM `connections` c								",
-			"		{$sqlConditions[3]} {$orderSql} {$limitSql}			",
-			"	) conns ON												",
-			"		conns.`id_connection` = q.`id_connection` AND		",
-			"		q.`id_query_type` = ".$queryTypes['delete']."		",
-			"	GROUP BY												",
-			"		q.`id_connection`									",
-			") deletes ON												",
-			"	deletes.`id_connection` = c.`id_connection`				",
-			
-			"{$sqlConditions[4]} {$orderSql} {$limitSql};				",
 		];
+
+		if ($selects) {
+			$sqlCondition = array_shift($sqlConditions);
+			$sql = array_merge($sql, [
+				"LEFT JOIN (											",
+				"	SELECT 												",
+				"		q.`id_connection`,								",
+				"		COUNT(q.`id_query_type`) AS `selects_count`		",
+				"	FROM `queries` q									",
+				"	JOIN (												",
+				"		SELECT c.`id_connection`						",
+				"		FROM `connections` c							",
+				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"	) conns ON											",
+				"		conns.`id_connection` = q.`id_connection` AND	",
+				"		q.`id_query_type` = ".$queryTypes['select']."	",
+				"	GROUP BY											",
+				"		q.`id_connection`								",
+				") selects ON											",
+				"	selects.`id_connection` = c.`id_connection`			",
+			]);
+		}
+		
+		if ($inserts) {
+			$sqlCondition = array_shift($sqlConditions);
+			$sql = array_merge($sql, [
+				"LEFT JOIN (											",
+				"	SELECT 												",
+				"		q.`id_connection`,								",
+				"		COUNT(q.`id_query_type`) AS `inserts_count`		",
+				"	FROM `queries` q									",
+				"	JOIN (												",
+				"		SELECT c.`id_connection`						",
+				"		FROM `connections` c							",
+				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"	) conns ON											",
+				"		conns.`id_connection` = q.`id_connection` AND	",
+				"		q.`id_query_type` = ".$queryTypes['insert']."	",
+				"	GROUP BY											",
+				"		q.`id_connection`								",
+				") inserts ON											",
+				"	inserts.`id_connection` = c.`id_connection`			",
+			]);
+		}
+		
+		if ($updates) {
+			$sqlCondition = array_shift($sqlConditions);
+			$sql = array_merge($sql, [
+				"LEFT JOIN (											",
+				"	SELECT 												",
+				"		q.`id_connection`,								",
+				"		COUNT(q.`id_query_type`) AS `updates_count`		",
+				"	FROM `queries` q									",
+				"	JOIN (												",
+				"		SELECT c.`id_connection`						",
+				"		FROM `connections` c							",
+				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"	) conns ON											",
+				"		conns.`id_connection` = q.`id_connection` AND	",
+				"		q.`id_query_type` = ".$queryTypes['update']."	",
+				"	GROUP BY											",
+				"		q.`id_connection`								",
+				") updates ON											",
+				"	updates.`id_connection` = c.`id_connection`			",
+		]);
+		}
+		
+		if ($deletes) {
+			$sqlCondition = array_shift($sqlConditions);
+			$sql = array_merge($sql, [
+				"LEFT JOIN (											",
+				"	SELECT 												",
+				"		q.`id_connection`,								",
+				"		COUNT(q.`id_query_type`) AS `deletes_count`		",
+				"	FROM `queries` q									",
+				"	JOIN (												",
+				"		SELECT c.`id_connection`						",
+				"		FROM `connections` c							",
+				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"	) conns ON											",
+				"		conns.`id_connection` = q.`id_connection` AND	",
+				"		q.`id_query_type` = ".$queryTypes['delete']."	",
+				"	GROUP BY											",
+				"		q.`id_connection`								",
+				") deletes ON											",
+				"	deletes.`id_connection` = c.`id_connection`			",
+			]);
+		}
+
+		$sqlCondition = array_shift($sqlConditions);
+		$sql = array_merge($sql, [
+			"{$sqlCondition} {$orderSql} {$limitSql};					",
+		]);
+
 		return [$sql, $params];
 	}
 	
-	protected function completeSqlConditionsAndParams ($pageDataSql = FALSE) {
+	protected function completeSqlConditionsAndParams ($collectionsCount = 1) {
 		$conditionsSqls = [];
 		$params = [];
-		$length = $pageDataSql ? 5 : 1;
-		for ($i = 0; $i < $length; $i++) {
+		for ($i = 0; $i < $collectionsCount; $i++) {
 			$conditionSqlItems = [];
 
 			$conditionSqlItems[] = "c.`id_general_log` = :id_gen_log{$i}";
