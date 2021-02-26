@@ -61,13 +61,21 @@ class Connections extends \App\Controllers\Base
 			->SetModel($model)
 			->SetMultiSorting(TRUE)
 			->SetMultiFiltering(TRUE)
-			->SetItemsPerPage(2)
-			->SetCountScales([2,10,100,1000,10000,0])
+			->SetItemsPerPage(10)
+			->SetCountScales([10,100,1000,10000,0])
+			->SetAllowedCustomUrlCountScale(TRUE)
+			/*->SetTranslator(function($key, $replacements = []) {
+				if (mb_substr($key, 0, 1) === '_')
+					return mb_substr($key, 1);
+				return "_{$key}";
+			})
+			->SetTranslateUrlNames(TRUE)*/
 			->SetConfigRendering(
 				(new \MvcCore\Ext\Controllers\DataGrids\Configs\Rendering)
 					->SetRenderControlPaging(\MvcCore\Ext\Controllers\IDataGrid::CONTROL_DISPLAY_IF_NECESSARY)
-					->SetControlPagingNearbyPagesCount(4)
-					->SetControlPagingOuterPagesCount(3)
+					->SetControlPagingOuterPagesDisplayRatio(2.0)
+					->SetRenderControlPagingFirstAndLast(TRUE)
+					->SetRenderControlPagingPrevAndNext(TRUE)
 			);
 	}
 }
