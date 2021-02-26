@@ -6,36 +6,29 @@ class Connections extends \App\Controllers\Base
 {
 	/** @var \App\Models\LogFile */
 	protected $generalLog;
+
 	/** @var \App\Models\Connection[] */
-	protected $connections;
+	//protected $connections;
 	/** @var int */
-	protected $totalCount;
+	//protected $totalCount;
 	/** @var array */
-	protected $orderFields;
+	//protected $orderFields;
 	/** @var string */
-	protected $orderField;
+	//protected $orderField;
 	/** @var string */
-	protected $direction;
+	//protected $direction;
 	/** @var int */
-	protected $offset;
+	//protected $offset;
 	/** @var int */
-	protected $limit;
+	//protected $limit;
 
-	public function IndexAction () {
+	public function Init () {
+		parent::Init();
+		if ($this->actionName !== 'index') return NULL;
 		$this->completeParams();
-		$this->totalCount = \App\Models\Connection::GetCount(
-			$this->generalLog->GetIdGeneralLog(), 
-			$this->offset, $this->limit
-		);
-		$this->connections = \App\Models\Connection::GetList(
-			$this->generalLog->GetIdGeneralLog(), 
-			$this->orderField, $this->direction, 
-			$this->offset, $this->limit
-		);
-		$this->setUpViewProps();
-		$this->setUpPaging();
+		$this->createGrid();
 	}
-
+	
 	public function MarkAction () {
 		$idConnection = $this->GetParam('id_connection', '0-9', NULL, 'int');
 		$mark = $this->GetParam('mark', '0-9', '0', 'int');
@@ -51,7 +44,60 @@ class Connections extends \App\Controllers\Base
 		]);
 	}
 
+	public function IndexAction () {
+		$this->view->heading = $this->generalLog->GetFileName() . ' - Connections';
+		$this->view->title = $this->generalLog->GetFileName();
+		
+		$this->view->backLink = $this->Url('Index:Index');
+
+		$this->view->Js('varFoot')
+			->Append(self::$staticPath . '/js/Marking.js');
+	}
+
 	protected function completeParams () {
+		$idGeneralLog = $this->GetParam('id_general_log', '0-9', NULL, 'int');
+		$this->generalLog = \App\Models\LogFile::GetById($idGeneralLog);
+		if (
+			$this->generalLog === NULL || (
+				$this->generalLog !== NULL && 
+				$this->generalLog->GetProcessed() === \App\Models\LogFile::NOT_PROCESSED
+			)
+		) throw new \Exception(
+			"General log with id: {$idGeneralLog} doesn't exist or it's not processed yet."
+		);
+	}
+	
+	protected function createGrid () {
+		$model = (new \App\Models\ConnectionsList)
+			->SetIdGeneralLog($this->generalLog->GetIdGeneralLog());
+		//xxx($model->GetConfigColumns());
+		$this->grid = (new \MvcCore\Ext\Controllers\DataGrid($this, 'grid'))
+			->SetCssClasses('connections')
+			->SetModel($model)
+			->SetMultiSorting(TRUE)
+			->SetMultiFiltering(TRUE)
+			->SetItemsPerPage(10)
+			->SetCountScales([10,100,1000,10000,0]);
+	}
+
+
+
+	public function IndexActionOld () {
+		$this->completeParams();
+		$this->totalCount = \App\Models\Connection::GetCount(
+			$this->generalLog->GetIdGeneralLog(), 
+			$this->offset, $this->limit
+		);
+		$this->connections = \App\Models\Connection::GetList(
+			$this->generalLog->GetIdGeneralLog(), 
+			$this->orderField, $this->direction, 
+			$this->offset, $this->limit
+		);
+		$this->setUpViewProps();
+		$this->setUpPaging();
+	}
+	
+	protected function completeParamsOld () {
 		$idGeneralLog = $this->GetParam('id_general_log', '0-9', NULL, 'int');
 		$this->generalLog = \App\Models\LogFile::GetById($idGeneralLog);
 		if (

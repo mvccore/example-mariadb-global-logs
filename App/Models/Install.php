@@ -31,7 +31,16 @@ class Install extends Base
 		return is_dir(self::GetDataDir());
 	}
 	public function IsCliDirInstalled () {
-		return is_dir(self::getCliDir());
+		$sourceFullPath = self::getAppRootDir() . self::$_cliDirDefault;
+		$targetFullPath = self::getCliDir();
+		if (!is_dir($targetFullPath)) return FALSE;
+		$srcDi = new \DirectoryIterator($sourceFullPath);
+		$targetDi = new \DirectoryIterator($targetFullPath);
+		$srcFilesCount = 0;
+		$targetFilesCount = 0;
+		foreach ($srcDi as $item) if (!$item->isDir() && !$item->isDot()) $srcFilesCount++;
+		foreach ($targetDi as $item) if (!$item->isDir() && !$item->isDot()) $targetFilesCount++;
+		return $srcFilesCount === $targetFilesCount;
 	}
 	public function IsDbInstalled () {
 		try {
@@ -85,7 +94,7 @@ class Install extends Base
 	public function InstallCliDir () {
 		$sourceFullPath = self::getAppRootDir() . self::$_cliDirDefault;
 		$targetFullPath = self::getCliDir();
-		if (!mkdir($targetFullPath, 0777, TRUE)) 
+		if (!is_dir($targetFullPath) && !mkdir($targetFullPath, 0777, TRUE)) 
 			throw new \Exception("Can't create directory `{$targetFullPath}`");
 		$di = new \DirectoryIterator($sourceFullPath);
 		foreach ($di as $item) {

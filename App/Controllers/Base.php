@@ -12,6 +12,9 @@ class Base extends \MvcCore\Controller {
 		if ($sysCfg === NULL) {
 			$defaultCfgPath = \App\Models\Install::GetSysConfigRelPathDefault();
 			$sysCfg = \MvcCore\Config::GetConfig($defaultCfgPath);
+			\MvcCore\Config::ClearConfigCache();
+			$cfgPath = $this->request->GetAppRoot() . \App\Models\Base::GetSysConfigRelPath();
+			\MvcCore\Config::SetConfigCache($cfgPath, $sysCfg);
 		}
 		if (isset($sysCfg->app->locale))
 			\MvcCore\Ext\Tools\Locale::SetLocale(LC_ALL, $sysCfg->app->locale);

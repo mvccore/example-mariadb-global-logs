@@ -16,7 +16,7 @@ class Bootstrap {
 			\MvcCore\Ext\Debugs\Tracy::$Editor = 'MSVS2019';
 			$app->SetDebugClass('\MvcCore\Ext\Debugs\Tracy');
 		}
-
+		
 		\MvcCore\Config::SetSystemConfigPath(
 			\App\Models\Base::GetSysConfigRelPath()
 		);

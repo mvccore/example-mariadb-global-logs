@@ -58,43 +58,43 @@ class Processing extends \App\Models\Base
 	public function LoadAllCollections () {
 		$db = self::GetConnection();
 		$this->databases = $db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"SELECT					",
 				"	d.`id_database`,	",
 				"	d.`database_name`	",
 				"FROM `databases` d		",
 				"ORDER BY				",
 				"	d.`id_database` ASC;",
-			]))
+			])
 			->FetchAll()
 			->ToScalars(
-				'database_name', NULL, 'id_database', 'int'
+				'id_database', 'int', 'database_name', NULL
 			);
 		$this->users = $db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"SELECT				",
 				"	u.`id_user`,	",
 				"	u.`user_name`	",
 				"FROM `users` u		",
 				"ORDER BY			",
 				"	u.`id_user` ASC;",
-			]))
+			])
 			->FetchAll()
 			->ToScalars(
-				'user_name', NULL, 'id_user', 'int'
+				'id_user', 'int', 'user_name', NULL
 			);
 		$this->queryTypes = $db
-			->Prepare(implode("\n", [
+			->Prepare([
 				"SELECT						",
 				"	qt.`id_query_type`,		",
 				"	qt.`query_type_name`	",
 				"FROM `query_types` qt		",
 				"ORDER BY					",
 				"	qt.`id_query_type` ASC;	",
-			]))
+			])
 			->FetchAll()
 			->ToScalars(
-				'query_type_name', NULL, 'id_query_type', 'int'
+				'id_query_type', 'int', 'query_type_name', NULL
 			);
 	}
 
