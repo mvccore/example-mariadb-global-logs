@@ -72,10 +72,9 @@ class Connections extends \App\Controllers\Base
 			->SetTranslateUrlNames(TRUE)*/
 			->SetConfigRendering(
 				(new \MvcCore\Ext\Controllers\DataGrids\Configs\Rendering)
+					->SetRenderTableHeadFiltering(TRUE)
 					->SetRenderControlPaging(\MvcCore\Ext\Controllers\IDataGrid::CONTROL_DISPLAY_IF_NECESSARY)
-					->SetControlPagingOuterPagesDisplayRatio(2.0)
 					->SetRenderControlPagingFirstAndLast(TRUE)
-					->SetRenderControlPagingPrevAndNext(TRUE)
 			);
 	}
 }
