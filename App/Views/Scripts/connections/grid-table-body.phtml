@@ -1,0 +1,56 @@
+<?php
+	/** @var $this \MvcCore\Ext\Controllers\DataGrids\View */
+	/** @var $grid \MvcCore\Ext\Controllers\DataGrid */
+	/** @var $model \MvcCore\Ext\Controllers\DataGrids\Models\GridModel */
+	/** @var $item \App\Models\Connection */
+?><tbody><?php
+
+	$ordering = $grid->GetOrdering();
+	$model = $grid->GetModel();
+	foreach ($grid->GetPageData() as $index => $item):
+
+		?><tr class="<?php
+			echo 'grid-row-' . ($index % 2 === 0 ? 'odd' : 'even');
+			if ($item->GetMark()) echo ' marked';
+		?>"><?php
+
+
+			foreach ($grid->GetConfigColumns() as $configColumn):
+				?><td class="<?php
+					echo 'grid-col-' . $configColumn->GetUrlName();
+				?>"><?php
+				
+				if ($configColumn->GetPropName() === 'idConnection'):
+					?><a href="<?php echo $url('Queries:Index', [
+						'id_connection'		=> $item->GetIdConnection(),
+					])?>"><?php echo $item->GetIdConnection(); ?></a><?php
+				elseif ($configColumn->GetPropName() === 'mark'):
+					?><a 
+						href="javascript:void(0);" 
+						onclick="mark(this);"
+						data-mark="<?php echo $item->GetMark() ? 1 : 0; ?>"
+						data-url="<?php echo $url(':Mark', [
+							'id_connection'		=> $item->GetIdConnection(),
+						])?>"><?php
+						echo $item->GetMark() ? 'unmark' : 'mark';
+					?></a><?php
+				else:
+					$cellValue = $model->RenderCell($item, $configColumn, $this);
+					if ($configColumn->GetFilter()):
+						?><a class="grid-filter-link" href="<?php
+							echo $grid->GridFilterUrl($configColumn, $cellValue);
+						?>"><?php
+							echo $cellValue;
+						?></a><?php
+					else:
+						echo $cellValue;
+					endif;
+				endif;
+
+				?></td><?php
+			endforeach;
+
+		?></tr><?php
+	endforeach;
+
+?></tbody>

@@ -22,7 +22,7 @@ class Queries extends \App\Controllers\Base
 		
 		$this->view->generalLog = $this->generalLog;
 		$this->view->connection = $this->connection;
-		$this->view->queries = $this->queries;
+		$this->view->queriesStream = $this->queriesStream;
 
 		$this->view->heading = $this->generalLog->GetFileName() . ' - Queries';
 		$this->view->title = $this->generalLog->GetFileName();

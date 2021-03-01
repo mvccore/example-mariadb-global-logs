@@ -72,6 +72,7 @@ class Connections extends \App\Controllers\Base
 			->SetTranslateUrlNames(TRUE)*/
 			->SetConfigRendering(
 				(new \MvcCore\Ext\Controllers\DataGrids\Configs\Rendering)
+					->SetTemplateTableBody($this->controllerName . '/grid-table-body')
 					->SetRenderTableHeadFiltering(TRUE)
 					->SetRenderControlPaging(\MvcCore\Ext\Controllers\IDataGrid::CONTROL_DISPLAY_IF_NECESSARY)
 					->SetRenderControlPagingFirstAndLast(TRUE)
