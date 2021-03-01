@@ -23,6 +23,7 @@ table.log-files tr td{border:1px solid #b7b7b7;padding:4px 10px;}
 .connections table.grid-content thead th,
 .connections table.grid-content td.grid-col-connected,
 .connections table.grid-content td.grid-col-disconnected{white-space:nowrap;}
+.connections table.grid-content thead th.grid-col-filtered{font-style:italic;}
 
 .connections table.grid-control-counts{margin:10px 0;}
 .connections table.grid-control-pages{margin:10px 0;float:right;}
