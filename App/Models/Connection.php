@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+/**
+ * @method static \MvcCore\Ext\Models\Db\Connection GetConnection(string|int|array|\stdClass|NULL $connectionNameOrConfig = NULL, bool $strict = TRUE)
+ */
 class Connection extends \App\Models\Base {
 	
 	use \App\Models\Connection\Props,

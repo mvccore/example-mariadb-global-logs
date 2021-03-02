@@ -82,7 +82,8 @@ class Connections extends \App\Controllers\Base
 					->SetRenderControlPaging(\MvcCore\Ext\Controllers\IDataGrid::CONTROL_DISPLAY_IF_NECESSARY)
 					->SetRenderControlPagingFirstAndLast(TRUE)
 			);
-		$filterForm = new \App\Forms\ConnectionsFilter;
+		$filterForm = (new \App\Forms\ConnectionsFilter($this->grid))
+			->SetGeneralLog($this->generalLog);
 		$this->grid->SetControlFilterForm($filterForm);
 	}
 }

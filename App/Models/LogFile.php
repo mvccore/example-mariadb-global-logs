@@ -90,6 +90,27 @@ class LogFile extends \App\Models\Base
 		return FALSE;
 	}
 
+	/** @return array */
+	public function GetUsers () {
+		return self::GetConnection()
+			->Prepare([
+				"SELECT 						",
+				"	c.id_user, u.user_name		",
+				"FROM connections c				",
+				"LEFT JOIN users u ON			",
+				"	u.id_user = c.id_user		",
+				"WHERE 							",
+				"	c.id_general_log = :id AND	",
+				"	c.id_user IS NOT NULL		",
+				"GROUP BY c.id_user				",
+				"ORDER BY u.user_name ASC;		",
+			])
+			->FetchAll([':id' => $this->idGeneralLog])
+			->ToScalars(
+				'user_name', 'string', 'id_user', 'int'
+			);
+	}
+
 	/** @return bool */
 	public function Save ($createNew = null, $flags = 0) {
 		if ($createNew || $this->idGeneralLog === NULL) {
