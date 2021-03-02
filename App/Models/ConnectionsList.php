@@ -52,7 +52,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 	}
 
 	protected function completeSqlAndParamsCount () {
-		list($sqlConditions, $params) = $this->completeSqlConditionsAndParams(1);
+		list($sqlConditions, $params) = $this->completeConditionSqlAndParams(1);
 		$sql = [
 			"SELECT COUNT(								",
 			"	c.`id_connection`						",
@@ -92,17 +92,12 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 				'query_type_name', 'string'
 			);
 		
-		list($sqlConditions, $params) = $this->completeSqlConditionsAndParams(
+		list($sqlConditions, $params) = $this->completeConditionSqlAndParams(
 			1 + count($queryTypes)
 		);
 
-		// ordering:
-		$orderSqlItems = [];
-		foreach ($this->ordering as $columnName => $direction)
-			$orderSqlItems[] = "`{$columnName}` {$direction}";
-		$orderSql = count($orderSqlItems) > 0
-			? " ORDER BY " . implode(", ", $orderSqlItems) . " "
-			: "";
+		// sorting:
+		$sortSql = $this->getSortingSql(TRUE);
 
 		
 		// offset and limit:
@@ -147,7 +142,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 				"	JOIN (												",
 				"		SELECT c.`id_connection`						",
 				"		FROM `connections` c							",
-				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"		{$sqlCondition} {$sortSql} {$limitSql}			",
 				"	) conns ON											",
 				"		conns.`id_connection` = q.`id_connection` AND	",
 				"		q.`id_query_type` = ".$queryTypes['select']."	",
@@ -169,7 +164,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 				"	JOIN (												",
 				"		SELECT c.`id_connection`						",
 				"		FROM `connections` c							",
-				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"		{$sqlCondition} {$sortSql} {$limitSql}			",
 				"	) conns ON											",
 				"		conns.`id_connection` = q.`id_connection` AND	",
 				"		q.`id_query_type` = ".$queryTypes['insert']."	",
@@ -191,7 +186,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 				"	JOIN (												",
 				"		SELECT c.`id_connection`						",
 				"		FROM `connections` c							",
-				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"		{$sqlCondition} {$sortSql} {$limitSql}			",
 				"	) conns ON											",
 				"		conns.`id_connection` = q.`id_connection` AND	",
 				"		q.`id_query_type` = ".$queryTypes['update']."	",
@@ -213,7 +208,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 				"	JOIN (												",
 				"		SELECT c.`id_connection`						",
 				"		FROM `connections` c							",
-				"		{$sqlCondition} {$orderSql} {$limitSql}			",
+				"		{$sqlCondition} {$sortSql} {$limitSql}			",
 				"	) conns ON											",
 				"		conns.`id_connection` = q.`id_connection` AND	",
 				"		q.`id_query_type` = ".$queryTypes['delete']."	",
@@ -226,49 +221,26 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 
 		$sqlCondition = array_shift($sqlConditions);
 		$sql = array_merge($sql, [
-			"{$sqlCondition} {$orderSql} {$limitSql};					",
+			"{$sqlCondition} {$sortSql} {$limitSql};					",
 		]);
-
+		
 		return [$sql, $params];
 	}
 	
-	protected function completeSqlConditionsAndParams ($collectionsCount = 1) {
+	protected function completeConditionSqlAndParams ($collectionsCount = 1) {
 		$conditionsSqls = [];
 		$params = [];
 		for ($i = 0; $i < $collectionsCount; $i++) {
-			$conditionSqlItems = [];
-
-			$conditionSqlItems[] = "c.`id_general_log` = :id_gen_log{$i}";
-			$params[":id_gen_log{$i}"] = $this->idGeneralLog;
-
-			$filterSql = [];
-			$index = 0;
-			foreach ($this->filtering as $columnName => $rawValues) {
-				if (count($rawValues) === 1) {
-					$rawValue = $rawValues[0];
-					$lastChar = mb_substr($rawValue, -1, 1);
-					if ($lastChar === '%') { // dev feature:-)
-						$conditionSqlItems[] = "c.`{$columnName}` LIKE :param_{$i}_{$index}";
-					} else {
-						$conditionSqlItems[] = "c.`{$columnName}` = :param_{$i}_{$index}";
-					}
-					$params[":param_{$i}_{$index}"] = $rawValue;
-					$index++;
-				} else {
-					$paramsNames = [];
-					foreach ($rawValues as $rawValue) {
-						$paramsNames[] = ":param_{$i}_{$index}";
-						$params[":param_{$i}_{$index}"] = $rawValue;
-						$index++;
-					}
-					$paramsNamesStr = implode(", ", $paramsNames);
-					$conditionSqlItems[] = "c.`{$columnName}` IN ({$paramsNamesStr})";
-				}
-			}
-
-			$conditionsSqls[$i] = " WHERE " . implode(" AND ", $conditionSqlItems) . " ";
+			list ($conditionSqlLocal, $params) = $this->getConditionSqlAndParams(
+				FALSE, 'c', $params, ":param_{$i}_"
+			);
+			$params[":id_gen_log_{$i}"] = $this->idGeneralLog;
+			$conditionSql = " WHERE c.`id_general_log` = :id_gen_log_{$i} ";
+			if ($conditionSqlLocal) $conditionSql .= "AND {$conditionSqlLocal} ";
+			$conditionsSqls[$i] = $conditionSql;
 		}
-
+		//x([$conditionsSqls, $params]);
 		return [$conditionsSqls, $params];
 	}
+
 }

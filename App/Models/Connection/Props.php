@@ -13,7 +13,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_connection",
 	 *    "humanName": "ID Connection",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -24,7 +24,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "mark",
 	 *    "humanName": "Marked",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -35,7 +35,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_thread",
 	 *    "humanName": "ID Thread",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -46,7 +46,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "connected",
 	 *    "humanName": "Connected",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var \DateTime
@@ -57,7 +57,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "disconnected",
 	 *    "humanName": "Disconnected",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var \DateTime
@@ -68,7 +68,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "requests_count",
 	 *    "humanName": "Requests Count",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -79,7 +79,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "queries_count",
 	 *    "humanName": "Queries Count",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -90,7 +90,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "user",
 	 *    "humanName": "User",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": false
 	 * })
 	 * @var string
@@ -101,7 +101,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "database",
 	 *    "humanName": "Database",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": false
 	 * })
 	 * @var string
@@ -112,7 +112,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_user",
 	 *    "humanName": "ID User",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -123,7 +123,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_database",
 	 *    "humanName": "ID Database",
-	 *    "order": true,
+	 *    "sort": true,
 	 *    "filter": true
 	 * })
 	 * @var int
@@ -135,7 +135,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "selects_count",
 	 *    "humanName": "SELECTs",
-	 *    "order": false,
+	 *    "sort": false,
 	 *    "filter": false
 	 * })
 	 * @var int
@@ -146,7 +146,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "inserts_count",
 	 *    "humanName": "INSERTs",
-	 *    "order": false,
+	 *    "sort": false,
 	 *    "filter": false
 	 * })
 	 * @var int
@@ -157,7 +157,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "updates_count",
 	 *    "humanName": "UPDATEs",
-	 *    "order": false,
+	 *    "sort": false,
 	 *    "filter": false
 	 * })
 	 * @var int
@@ -168,7 +168,7 @@ trait Props {
 	 * @datagrid Column({
 	 *    "dbColumnName": "deletes_count",
 	 *    "humanName": "DELETEs",
-	 *    "order": false,
+	 *    "sort": false,
 	 *    "filter": false
 	 * })
 	 * @var int

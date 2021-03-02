@@ -58,9 +58,13 @@ class Connections extends \App\Controllers\Base
 		//xxx($model->GetConfigColumns());
 		$this->grid = (new \MvcCore\Ext\Controllers\DataGrid($this, 'grid'))
 			->SetCssClasses('connections')
+			->SetSortingMode(\MvcCore\Ext\Controllers\IDataGrid::SORT_MULTIPLE_COLUMNS)
+			->SetFilteringMode(
+				\MvcCore\Ext\Controllers\IDataGrid::FILTER_MULTIPLE_COLUMNS |
+				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_RANGES |
+				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_LIKE_ANYWHERE
+			)
 			->SetModel($model)
-			->SetMultiSorting(TRUE)
-			->SetMultiFiltering(TRUE)
 			->SetItemsPerPage(10)
 			->SetCountScales([10,100,1000,10000,0])
 			->SetAllowedCustomUrlCountScale(TRUE)
@@ -73,9 +77,12 @@ class Connections extends \App\Controllers\Base
 			->SetConfigRendering(
 				(new \MvcCore\Ext\Controllers\DataGrids\Configs\Rendering)
 					->SetTemplateTableBody($this->controllerName . '/grid-table-body')
+					->SetRenderFilterForm(TRUE)
 					->SetRenderTableHeadFiltering(TRUE)
 					->SetRenderControlPaging(\MvcCore\Ext\Controllers\IDataGrid::CONTROL_DISPLAY_IF_NECESSARY)
 					->SetRenderControlPagingFirstAndLast(TRUE)
 			);
+		$filterForm = new \App\Forms\ConnectionsFilter;
+		$this->grid->SetControlFilterForm($filterForm);
 	}
 }
