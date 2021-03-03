@@ -57,16 +57,20 @@ class Connections extends \App\Controllers\Base
 			->SetIdGeneralLog($this->generalLog->GetIdGeneralLog());
 		//xxx($model->GetConfigColumns());
 		$this->grid = (new \MvcCore\Ext\Controllers\DataGrid($this, 'grid'))
-			->SetCssClasses('connections')
-			->SetSortingMode(\MvcCore\Ext\Controllers\IDataGrid::SORT_MULTIPLE_COLUMNS)
+			->AddCssClasses('connections')
+			->SetSortingMode(
+				//\MvcCore\Ext\Controllers\IDataGrid::SORT_DISABLED
+				\MvcCore\Ext\Controllers\IDataGrid::SORT_MULTIPLE_COLUMNS
+			)
 			->SetFilteringMode(
+				//\MvcCore\Ext\Controllers\IDataGrid::FILTER_DISABLED
 				\MvcCore\Ext\Controllers\IDataGrid::FILTER_MULTIPLE_COLUMNS |
 				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_RANGES |
 				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_LIKE_ANYWHERE
 			)
 			->SetModel($model)
-			->SetItemsPerPage(10)
-			->SetCountScales([10,100,1000,10000,0])
+			->SetItemsPerPage(100)
+			->SetCountScales([100,1000,10000,0])
 			->SetAllowedCustomUrlCountScale(TRUE)
 			/*->SetTranslator(function($key, $replacements = []) {
 				if (mb_substr($key, 0, 1) === '_')

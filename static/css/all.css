@@ -15,6 +15,7 @@ table.log-files{border-collapse:collapse;}
 table.log-files tr th,
 table.log-files tr td{border:1px solid #b7b7b7;padding:4px 10px;}
 
+.connections{display:table;padding:0 20px 0 0;}
 .connections .grid-controls{overflow-y:hidden;}
 .connections table.grid-content{border-collapse:collapse;}
 .connections table.grid-content tr.marked td{background:#ddd;}
@@ -23,7 +24,13 @@ table.log-files tr td{border:1px solid #b7b7b7;padding:4px 10px;}
 .connections table.grid-content thead th,
 .connections table.grid-content td.grid-col-connected,
 .connections table.grid-content td.grid-col-disconnected{white-space:nowrap;}
+.connections table.grid-content thead th{vertical-align:top;padding:4px 10px 2px 10px;}
 .connections table.grid-content thead th.grid-col-filtered{font-style:italic;}
+.connections table.grid-content thead th div.grid-head-filter{position:relative;left:-8px;width:calc(100% - 9px);margin-top:2px;padding-right:25px;}
+.connections table.grid-content thead th div.grid-head-filter input{display:table;width:100%;}
+.connections table.grid-content thead th div.grid-head-filter button.filter{display:none;}
+.connections table.grid-content thead th div.grid-head-filter button.clear{position:absolute;width:16px;top:0;right:0;overflow:hidden;text-indent:-1000px;cursor:pointer;}
+.connections table.grid-content thead th div.grid-head-filter button.clear:after{position:absolute;left:1.5px;top:0px;font-size:15px;text-indent:0px;content:'\00D7 ';}
 
 .connections table.grid-control-counts{margin:10px 0;}
 .connections table.grid-control-pages{margin:10px 0;float:right;}
