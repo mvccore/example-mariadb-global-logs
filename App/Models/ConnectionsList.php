@@ -97,7 +97,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 		);
 
 		// sorting:
-		$sortSql = $this->getSortingSql(TRUE);
+		$sortSql = $this->getSortingSql(TRUE, NULL, "``");
 
 		
 		// offset and limit:
@@ -232,7 +232,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 		$params = [];
 		for ($i = 0; $i < $collectionsCount; $i++) {
 			list ($conditionSqlLocal, $params) = $this->getConditionSqlAndParams(
-				FALSE, 'c', $params, ":param_{$i}_"
+				FALSE, 'c', $params, ":param_{$i}_", "``"
 			);
 			$params[":id_gen_log_{$i}"] = $this->idGeneralLog;
 			$conditionSql = " WHERE c.`id_general_log` = :id_gen_log_{$i} ";

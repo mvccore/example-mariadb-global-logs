@@ -47,7 +47,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Forms\IFilterForm {
 
 		$users = (new Fields\Select)
 			->SetOptions($this->generalLog->GetUsers())
-			->SetName('users')
+			->SetName('idUser')
 			->SetLabel('Users')
 			->SetMultiple(TRUE);
 
@@ -61,33 +61,35 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Forms\IFilterForm {
 			$users, 
 			$filter
 		);
-		
-		if (!$submit) {
-			$values = [];
-			if (isset($this->filtering['requests_count'])) {
-				$reqCount = $this->filtering['requests_count'];
-				if (isset($reqCount['>=']))
-					$values['requestsCountMin'] = $reqCount['>='][0];
-				if (isset($reqCount['<=']))
-					$values['requestsCountMax'] = $reqCount['<='][0];
-			}
-			if (isset($this->filtering['queries_count'])) {
-				$queriesCount = $this->filtering['queries_count'];
-				if (isset($queriesCount['>=']))
-					$values['queriesCountMin'] = $queriesCount['>='][0];
-				if (isset($queriesCount['<=']))
-					$values['queriesCountMax'] = $queriesCount['<='][0];
-			}
-			if (isset($this->filtering['id_user'])) {
-				$userIds = $this->filtering['id_user'];
-				if (isset($userIds['=']))
-					$values['users'] = array_map('intval', $userIds['=']);
-			}
-			if ($values)
-				$this->SetValues($values);
-		}
 	}
 	
+	public function PreDispatch ($submit = FALSE){
+		parent::PreDispatch($submit);
+		if ($submit) return;
+		$values = [];
+		if (isset($this->filtering['requestsCount'])) {
+			$reqCount = $this->filtering['requestsCount'];
+			if (isset($reqCount['>=']))
+				$values['requestsCountMin'] = $reqCount['>='][0];
+			if (isset($reqCount['<=']))
+				$values['requestsCountMax'] = $reqCount['<='][0];
+		}
+		if (isset($this->filtering['queriesCount'])) {
+			$queriesCount = $this->filtering['queriesCount'];
+			if (isset($queriesCount['>=']))
+				$values['queriesCountMin'] = $queriesCount['>='][0];
+			if (isset($queriesCount['<=']))
+				$values['queriesCountMax'] = $queriesCount['<='][0];
+		}
+		if (isset($this->filtering['idUser'])) {
+			$userIds = $this->filtering['idUser'];
+			if (isset($userIds['=']))
+				$values['idUser'] = array_map('intval', $userIds['=']);
+		}
+		if ($values)
+			$this->SetValues($values);
+	}
+
 	public function Submit (array & $rawRequestParams = []) {
 		list($result, $values, $errors) = parent::Submit($rawRequestParams);
 		if ($result) {
@@ -101,7 +103,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Forms\IFilterForm {
 					'<='		=> $values['queriesCountMax'],
 				],
 				'idUser'		=> [
-					'='			=> $values['users'],
+					'='			=> $values['idUser'],
 				],
 			];
 		}

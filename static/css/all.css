@@ -32,8 +32,8 @@ table.log-files tr td{border:1px solid #b7b7b7;padding:4px 10px;}
 .connections table.grid-content thead th div.grid-head-filter button.clear{position:absolute;width:16px;top:0;right:0;overflow:hidden;text-indent:-1000px;cursor:pointer;}
 .connections table.grid-content thead th div.grid-head-filter button.clear:after{position:absolute;left:1.5px;top:0px;font-size:15px;text-indent:0px;content:'\00D7 ';}
 
-.connections table.grid-control-counts{margin:10px 0;}
-.connections table.grid-control-pages{margin:10px 0;float:right;}
+.connections table.grid-control-count-scales{margin:10px 0;}
+.connections table.grid-control-paging{margin:10px 0;float:right;}
 
 a.expand-collapse-control{
 	font-size:1.15em;
