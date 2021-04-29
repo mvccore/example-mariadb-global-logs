@@ -28,7 +28,7 @@ class Base extends \MvcCore\Controller {
 		parent::PreDispatch();
 		if ($this->viewEnabled) {
 			$this->_preDispatchSetUpBundles();
-			/** @var $formatDateHelper \MvcCore\Ext\Views\Helpers\FormatDateHelper */
+			/** @var \MvcCore\Ext\Views\Helpers\FormatDateHelper $formatDateHelper */
 			$formatDateHelper = $this->view->GetHelper('FormatDate');
 			$formatDateHelper
 				->SetStrftimeFormatMask('%Y-%m-%d %H:%M:%S')

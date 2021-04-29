@@ -12,7 +12,7 @@ class Base extends \MvcCore\Ext\Models\Db\Models\MySql {
 
 	/** @return \MvcCore\Ext\Models\Db\Connection */
 	public static function GetConnection ($connectionNameOrConfig = NULL, $strict = true) {
-		/** @var $conn \MvcCore\Ext\Models\Db\Connection */
+		/** @var \MvcCore\Ext\Models\Db\Connection $conn */
 		$conn = parent::GetConnection(0, $strict);
 		return $conn;
 	}

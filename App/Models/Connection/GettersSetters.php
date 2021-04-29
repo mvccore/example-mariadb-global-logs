@@ -6,7 +6,7 @@ trait GettersSetters {
 
 	/** @return int */
 	public function GetIdConnection () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->idConnection;
 	}
 	/**
@@ -14,13 +14,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetIdConnection ($idConnection) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->idConnection = $idConnection;
 		return $this;
 	}
 	/** @return int */
 	public function GetIdGeneralLog () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->idGeneralLog;
 	}
 	/**
@@ -28,13 +28,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetIdGeneralLog ($idGeneralLog) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->idGeneralLog = $idGeneralLog;
 		return $this;
 	}
 	/** @return int */
 	public function GetIdUser () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->idUser;
 	}
 	/**
@@ -42,13 +42,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetIdUser ($idUser) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->idUser = $idUser;
 		return $this;
 	}
 	/** @return string */
 	public function GetUser () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->user;
 	}
 	/**
@@ -56,13 +56,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetUser ($user) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->user = $user;
 		return $this;
 	}
 	/** @return int */
 	public function GetIdDatabase () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->idDatabase;
 	}
 	/**
@@ -70,13 +70,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetIdDatabase ($idDatabase) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->idDatabase = $idDatabase;
 		return $this;
 	}
 	/** @return string */
 	public function GetDatabase () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->database;
 	}
 	/**
@@ -84,13 +84,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetDatabase ($database) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->database = $database;
 		return $this;
 	}
 	/** @return int */
 	public function GetIdThread () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->idThread;
 	}
 	/**
@@ -98,13 +98,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetIdThread ($idThread) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->idThread = $idThread;
 		return $this;
 	}
 	/** @return \DateTime|NULL */
 	public function GetConnected () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->connected;
 	}
 	/**
@@ -112,13 +112,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetConnected ($connected) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->connected = $connected;
 		return $this;
 	}
 	/** @return \DateTime|NULL */
 	public function GetDisconnected () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->disconnected;
 	}
 	/**
@@ -126,13 +126,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetDisconnected ($disconnected) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->disconnected = $disconnected;
 		return $this;
 	}
 	/** @return int */
 	public function GetRequestsCount () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->requestsCount;
 	}
 	/**
@@ -140,13 +140,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetRequestsCount ($requestsCount) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->requestsCount = $requestsCount;
 		return $this;
 	}
 	/** @return int */
 	public function GetQueriesCount () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->queriesCount;
 	}
 	/**
@@ -154,13 +154,13 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetQueriesCount ($queriesCount) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->queriesCount = $queriesCount;
 		return $this;
 	}
 	/** @return int */
 	public function GetMark () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->mark;
 	}
 	/**
@@ -168,35 +168,35 @@ trait GettersSetters {
 	 * @return \App\Models\Connection
 	 */
 	public function SetMark ($mark) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$this->mark = $mark;
 		return $this;
 	}
 	/** @return \App\Models\LogFile */
 	public function GetGeneralLog () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return \App\Models\LogFile::GetById($this->idGeneralLog);
 	}
 
 
 	/** @return int */
 	public function GetSelectsCount () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->selectsCount;	
 	}
 	/** @return int */
 	public function GetInsertsCount () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->insertsCount;	
 	}
 	/** @return int */
 	public function GetUpdatesCount () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->updatesCount;	
 	}
 	/** @return int */
 	public function GetDeletesCount () {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		return $this->deletesCount;	
 	}
 }

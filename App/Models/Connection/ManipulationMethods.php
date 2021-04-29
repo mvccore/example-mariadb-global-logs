@@ -12,7 +12,7 @@ trait ManipulationMethods {
 	 * @return bool
 	 */
 	public function Save ($createNew = NULL, $flags = 0) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		if ($createNew || $this->idConnection === NULL) {
 			return $this->Insert($flags);
 		} else {
@@ -22,7 +22,7 @@ trait ManipulationMethods {
 	
 	/** @return bool */
 	public function Insert ($flags = 0) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$result = TRUE;
 		$data = $this->GetValues(
 			self::PROPS_PROTECTED |
@@ -70,7 +70,7 @@ trait ManipulationMethods {
 
 	/** @return bool */
 	public function Update ($flags = 0) {
-		/** @var $this \App\Models\Connection */
+		/** @var \App\Models\Connection $this */
 		$data = $this->GetTouched(
 			self::PROPS_PROTECTED |
 			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES

@@ -31,7 +31,7 @@ class Index extends Base {
 		if ($result !== \MvcCore\Ext\IForm::RESULT_ERRORS) {
 			try {
 				$hash = $this->GetParam('hash', 'a-zA-Z0-9');
-				/** @var $logFile \App\Models\LogFile */
+				/** @var \App\Models\LogFile $logFile */
 				$logFile = \App\Models\LogFile::GetFileByHash($hash);
 				if (!$logFile->IsSavedInDatabase()) 
 					$logFile->Save();
@@ -62,7 +62,7 @@ class Index extends Base {
 		foreach ($logsFilesIds as $logFileIdStr) {
 			$logFileId = intval($logFileIdStr);
 			if (isset($bgProcesses[$logFileId])) {
-				/** @var $bgProcess \App\Models\BgProcess */
+				/** @var \App\Models\BgProcess $bgProcess */
 				$bgProcess = $bgProcesses[$logFileId];
 				$progress = $bgProcess->GetProgress();
 				$progressFormatted = number_format($progress, 2, '.', '');
