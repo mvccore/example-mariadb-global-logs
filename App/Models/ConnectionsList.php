@@ -13,21 +13,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 	use \MvcCore\Ext\Controllers\DataGrids\Models\GridModel,
 		\MvcCore\Ext\Controllers\DataGrids\Models\GridColumns;
 
-	/**
-	 * @var int
-	 */
-	protected $idGeneralLog = NULL;
-
-	/**
-	 * @param  int $idGeneralLog 
-	 * @return \App\Models\ConnectionsList
-	 */
-	public function SetIdGeneralLog ($idGeneralLog) {
-		$this->idGeneralLog = $idGeneralLog;
-		return $this;
-	}
-	
-	protected function load (): void {
+	protected function load () {
 		if ($this->offset === NULL) $this->offset = 0;
 		if ($this->limit === NULL) $this->limit = PHP_INT_MAX;
 
