@@ -8,7 +8,15 @@ class		ConnectionsFilter
 extends		\MvcCore\Ext\Form 
 implements	\MvcCore\Ext\Controllers\DataGrids\Forms\IFilterForm {
 
-	use \MvcCore\Ext\Controllers\DataGrids\Forms\FilterForm;
+	// PHP 5.4 compatible
+	use \MvcCore\Ext\Controllers\DataGrids\Forms\FilterForm {
+		\MvcCore\Ext\Controllers\DataGrids\Forms\FilterForm::__construct as private __constructFilterForm;
+	}
+	public function __construct (\MvcCore\IController $controller = NULL) {
+		parent::__construct($controller);
+		$this->__constructFilterForm($controller);
+	}
+	// PHP 5.4 compatible
 
 	protected $id = 'connections-filter';
 

@@ -31,7 +31,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 			->Prepare($pageDataSql)
 			->StreamAll($pageDataParams)
 			->ToInstances(
-				\App\Models\Connection::class,
+				'\App\Models\Connection',
 				self::PROPS_PROTECTED |
 				self::PROPS_CONVERT_UNDERSCORES_TO_CAMELCASE
 			);

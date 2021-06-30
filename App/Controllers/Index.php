@@ -56,7 +56,7 @@ class Index extends Base {
 		$logsFilesIdsRaw = $this->GetParam('logs_files_ids', '0-9,');
 		$logsFilesIds = explode(',', $logsFilesIdsRaw);
 		$bgProcesses = \App\Models\BgProcess::GetByLogsIdsCtrlAndAction(
-			$logsFilesIds, \App\Controllers\BgProcesses\LogFile::class, 'Index'
+			$logsFilesIds, '\App\Controllers\BgProcesses\LogFile', 'Index'
 		);
 		$result = [];
 		foreach ($logsFilesIds as $logFileIdStr) {
