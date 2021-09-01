@@ -73,8 +73,6 @@ class Connections extends \App\Controllers\Base
 			->SetCountScales([100,1000,10000,0])
 			->SetAllowedCustomUrlCountScale(TRUE)
 			/*->SetTranslator(function($key, $replacements = []) {
-				if (mb_substr($key, 0, 1) === '_')
-					return mb_substr($key, 1);
 				return "_{$key}";
 			})
 			->SetTranslateUrlNames(TRUE)*/
