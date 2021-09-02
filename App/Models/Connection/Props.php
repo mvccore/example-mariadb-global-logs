@@ -12,7 +12,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_connection",
-	 *    "humanName": "ID Connection",
+	 *    "headingName": "ID Connection",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -23,7 +23,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "mark",
-	 *    "humanName": "Marked",
+	 *    "headingName": "Marked",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -34,7 +34,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_thread",
-	 *    "humanName": "ID Thread",
+	 *    "headingName": "ID Thread",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -45,7 +45,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "connected",
-	 *    "humanName": "Connected",
+	 *    "headingName": "Connected",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -56,7 +56,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "disconnected",
-	 *    "humanName": "Disconnected",
+	 *    "headingName": "Disconnected",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -67,7 +67,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "requests_count",
-	 *    "humanName": "Requests Count",
+	 *    "headingName": "Requests Count",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -78,7 +78,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "queries_count",
-	 *    "humanName": "Queries Count",
+	 *    "headingName": "Queries Count",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -89,7 +89,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "user",
-	 *    "humanName": "User",
+	 *    "headingName": "User",
 	 *    "sort": true,
 	 *    "filter": false
 	 * })
@@ -100,7 +100,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "database",
-	 *    "humanName": "Database",
+	 *    "headingName": "Database",
 	 *    "sort": true,
 	 *    "filter": false
 	 * })
@@ -111,7 +111,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_user",
-	 *    "humanName": "ID User",
+	 *    "headingName": "ID User",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -122,7 +122,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "id_database",
-	 *    "humanName": "ID Database",
+	 *    "headingName": "ID Database",
 	 *    "sort": true,
 	 *    "filter": true
 	 * })
@@ -134,7 +134,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "selects_count",
-	 *    "humanName": "SELECTs",
+	 *    "headingName": "SELECTs",
 	 *    "sort": false,
 	 *    "filter": false
 	 * })
@@ -145,7 +145,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "inserts_count",
-	 *    "humanName": "INSERTs",
+	 *    "headingName": "INSERTs",
 	 *    "sort": false,
 	 *    "filter": false
 	 * })
@@ -156,7 +156,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "updates_count",
-	 *    "humanName": "UPDATEs",
+	 *    "headingName": "UPDATEs",
 	 *    "sort": false,
 	 *    "filter": false
 	 * })
@@ -167,7 +167,7 @@ trait Props {
 	/**
 	 * @datagrid Column({
 	 *    "dbColumnName": "deletes_count",
-	 *    "humanName": "DELETEs",
+	 *    "headingName": "DELETEs",
 	 *    "sort": false,
 	 *    "filter": false
 	 * })
