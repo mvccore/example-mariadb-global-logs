@@ -31,8 +31,7 @@ class Base extends \MvcCore\Controller {
 			/** @var \MvcCore\Ext\Views\Helpers\FormatDateHelper $formatDateHelper */
 			$formatDateHelper = $this->view->GetHelper('FormatDate');
 			$formatDateHelper
-				->SetDefaultFormatMask('%Y-%m-%d %H:%M:%S')
-				->SetIntlExtensionFormatting(FALSE);
+				->SetDefaultFormatMask('yyyy-MM-dd HH:mm:ss');
 			$this->view->basePath = $this->GetRequest()->GetBasePath();
 		}
 	}
