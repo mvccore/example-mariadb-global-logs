@@ -34,7 +34,7 @@
 						echo $item->GetMark() ? 'unmark' : 'mark';
 					?></a><?php
 				else:
-					$cellValue = $model->RenderCell($item, $configColumn, $this);
+					$cellValue = $item->RenderCell($configColumn, $this);
 					if ($configColumn->GetFilter()):
 						?><a class="grid-filter-link" href="<?php
 							echo $grid->GridFilterUrl($configColumn, $cellValue);

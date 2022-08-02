@@ -12,6 +12,8 @@ class Connection extends \App\Models\Base {
 		\App\Models\Connection\StaticMethods,
 		\App\Models\Connection\ManipulationMethods;
 
+	use \MvcCore\Ext\Controllers\DataGrids\Models\GridRow;
+
 	/**
 	 * @return \MvcCore\Ext\Models\Db\Readers\Streams\Iterator
 	 */

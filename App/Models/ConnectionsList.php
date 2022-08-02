@@ -10,8 +10,8 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 	use \App\Models\Connection\Props,
 		\App\Models\Connection\GettersSetters;
 
-	use \MvcCore\Ext\Controllers\DataGrids\Models\GridModel,
-		\MvcCore\Ext\Controllers\DataGrids\Models\GridColumns;
+	use \MvcCore\Ext\Controllers\DataGrids\Models\GridColumns,
+		\MvcCore\Ext\Controllers\DataGrids\Models\GridModel;
 
 	protected function load () {
 		if ($this->offset === NULL) $this->offset = 0;

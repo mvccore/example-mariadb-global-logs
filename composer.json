@@ -29,7 +29,7 @@
 		"mvccore/ext-form-field-numeric": "^5.0",
 		"mvccore/ext-form-field-date": "^5.0",
 		"mvccore/ext-form-field-selection": "^5.0",
-		"mvccore/ext-controller-datagrid": "^5.1",
+		"mvccore/ext-controller-datagrid": "^5.1.13",
 		"mvccore/ext-debug-tracy": "^5.0",
 		"mvccore/ext-debug-tracy-mvccore": "^5.0",
 		"mvccore/ext-debug-tracy-routing": "^5.0",
