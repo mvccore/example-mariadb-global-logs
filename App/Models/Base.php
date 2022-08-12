@@ -5,10 +5,10 @@ namespace App\Models;
 class Base extends \MvcCore\Ext\Models\Db\Models\MySql {
 
 	private static $_appRoot = NULL;
-	private static $_sysCfgRelPath = '/mysql_global_logs.ini';
-	private static $_cliDir = '/Var/Cli';
-	private static $_dataDir = '/Data';
-	private static $_cacheDir = '/Var/Cache';
+	private static $_sysCfgRelPath = '~/mysql_global_logs.ini';
+	private static $_cliDir = '~/Var/Cli';
+	private static $_dataDir = '~/Data';
+	private static $_cacheDir = '~/Var/Cache';
 
 	/** @return \MvcCore\Ext\Models\Db\Connection */
 	public static function GetConnection ($connectionNameOrConfig = NULL, $strict = true) {
@@ -21,14 +21,14 @@ class Base extends \MvcCore\Ext\Models\Db\Models\MySql {
 		return static::$_sysCfgRelPath;
 	}
 	public static function GetDataDir () {
-		return self::getAppRootDir() . self::$_dataDir;
+		return self::getAppRootDir() . mb_substr(self::$_dataDir, 1);
 	}
 
 	protected static function getCliDir () {
-		return self::getAppRootDir() . self::$_cliDir;
+		return self::getAppRootDir() . mb_substr(self::$_cliDir, 1);
 	}
 	protected static function getCacheDir () {
-		return self::getAppRootDir() . self::$_cacheDir;
+		return self::getAppRootDir() . mb_substr(self::$_cacheDir, 1);
 	}
 	protected static function getAppRootDir () {
 		return self::$_appRoot ?: (

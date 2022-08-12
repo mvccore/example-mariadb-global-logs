@@ -4,9 +4,9 @@ namespace App\Models;
 
 class Install extends Base
 {
-	private static $_sysCfgRelPathDefault = '/App/config_default.ini';
-	private static $_cliDirDefault = '/App/Cli';
-	private static $_installSqlCommands = '/App/install.sql';
+	private static $_sysCfgRelPathDefault = '~/App/config_default.ini';
+	private static $_cliDirDefault = '~/App/Cli';
+	private static $_installSqlCommands = '~/App/install.sql';
 
 	public static function GetSysConfigRelPathDefault () {
 		return self::$_sysCfgRelPathDefault;
@@ -31,7 +31,7 @@ class Install extends Base
 		return is_dir(self::GetDataDir());
 	}
 	public function IsCliDirInstalled () {
-		$sourceFullPath = self::getAppRootDir() . self::$_cliDirDefault;
+		$sourceFullPath = self::getAppRootDir() . mb_substr(self::$_cliDirDefault, 1);
 		$targetFullPath = self::getCliDir();
 		if (!is_dir($targetFullPath)) return FALSE;
 		$srcDi = new \DirectoryIterator($sourceFullPath);
@@ -68,8 +68,8 @@ class Install extends Base
 
 	public function InstallConfig () {
 		$appRoot = self::getAppRootDir();
-		$sourceFullPath = $appRoot . self::$_sysCfgRelPathDefault;
-		$targetFullPath = $appRoot . \App\Models\Install::GetSysConfigRelPath();
+		$sourceFullPath = $appRoot . mb_substr(self::$_sysCfgRelPathDefault, 1);
+		$targetFullPath = $appRoot . mb_substr(\App\Models\Install::GetSysConfigRelPath());
 		if (!file_exists($sourceFullPath)) {
 			throw new \Exception(
 				"Default config doesn't exist in location: {$sourceFullPath}."
@@ -92,7 +92,7 @@ class Install extends Base
 	}
 
 	public function InstallCliDir () {
-		$sourceFullPath = self::getAppRootDir() . self::$_cliDirDefault;
+		$sourceFullPath = self::getAppRootDir() . mb_substr(self::$_cliDirDefault, 1);
 		$targetFullPath = self::getCliDir();
 		if (!is_dir($targetFullPath) && !mkdir($targetFullPath, 0777, TRUE)) 
 			throw new \Exception("Can't create directory `{$targetFullPath}`");
@@ -148,7 +148,7 @@ class Install extends Base
 	}
 
 	protected function getDbInstallCommands () {
-		$rawCmds = file_get_contents(self::getAppRootDir() . self::$_installSqlCommands);
+		$rawCmds = file_get_contents(self::getAppRootDir() . mb_substr(self::$_installSqlCommands, 1));
 		$cmds = explode(';', $rawCmds);
 		array_walk($cmds, function ($item, $key) use (& $cmds) {
 			$item = trim($item);

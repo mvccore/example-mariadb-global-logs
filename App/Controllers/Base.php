@@ -13,7 +13,7 @@ class Base extends \MvcCore\Controller {
 			$defaultCfgPath = \App\Models\Install::GetSysConfigRelPathDefault();
 			$sysCfg = \MvcCore\Config::GetConfig($defaultCfgPath);
 			\MvcCore\Config::ClearConfigCache();
-			$cfgPath = $this->request->GetAppRoot() . \App\Models\Base::GetSysConfigRelPath();
+			$cfgPath = \App\Models\Base::GetSysConfigRelPath();
 			\MvcCore\Config::SetConfigCache($cfgPath, $sysCfg);
 		}
 		if (isset($sysCfg->app->locale))
@@ -46,6 +46,7 @@ class Base extends \MvcCore\Controller {
 	}
 
 	private function _preDispatchSetUpBundles () {
+		$cfg = $this->GetSystemConfig();
 		\MvcCore\Ext\Views\Helpers\Assets::SetGlobalOptions(
 			(array) \MvcCore\Config::GetSystem()->assets
 		);
