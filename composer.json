@@ -22,7 +22,7 @@
 	"require": {
 		"php": ">=5.4.0",
 		"mvccore/mvccore": "^5.1.37",
-		"mvccore/ext-model-db": "^5.1.11",
+		"mvccore/ext-model-db": "^5.1.12",
 		"mvccore/ext-model-db-mysql": "^5.1",
 		"mvccore/ext-form": "^5.1.5",
 		"mvccore/ext-form-field-text": "^5.0",
