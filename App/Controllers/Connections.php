@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-class Connections extends \App\Controllers\Base
-{
+class Connections extends \App\Controllers\Base {
+
 	/** @var \App\Models\LogFile */
 	protected $generalLog;
 
@@ -53,8 +53,8 @@ class Connections extends \App\Controllers\Base
 	}
 	
 	protected function createGrid () {
-		$model = (new \App\Models\ConnectionsList)
-			->SetIdGeneralLog($this->generalLog->GetIdGeneralLog());
+		$model = new \App\Models\ConnectionsList;
+		$model->SetIdGeneralLog($this->generalLog->GetIdGeneralLog());
 		//xxx($model->GetConfigColumns());
 		$this->grid = (new \MvcCore\Ext\Controllers\DataGrid($this, 'grid'))
 			->AddCssClasses('connections')
@@ -65,10 +65,13 @@ class Connections extends \App\Controllers\Base
 			->SetFilteringMode(
 				//\MvcCore\Ext\Controllers\IDataGrid::FILTER_DISABLED
 				\MvcCore\Ext\Controllers\IDataGrid::FILTER_MULTIPLE_COLUMNS |
+				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_NULL |
+				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_EQUALS |
 				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_RANGES |
 				\MvcCore\Ext\Controllers\IDataGrid::FILTER_ALLOW_LIKE_ANYWHERE
 			)
 			->SetModel($model)
+			->SetRowClass('\App\Models\Connection')
 			->SetItemsPerPage(100)
 			->SetCountScales([100,1000,10000,0])
 			->SetAllowedCustomUrlCountScale(TRUE)

@@ -5,7 +5,9 @@ namespace App\Models;
 /**
  * @method static \MvcCore\Ext\Models\Db\Connection GetConnection(string|int|array|\stdClass|NULL $connectionNameOrConfig = NULL, bool $strict = TRUE)
  */
-class Connection extends \App\Models\Base {
+class		Connection
+extends		\App\Models\Base 
+implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridRow {
 	
 	use \App\Models\Connection\Props,
 		\App\Models\Connection\GettersSetters,
@@ -13,7 +15,7 @@ class Connection extends \App\Models\Base {
 		\App\Models\Connection\ManipulationMethods;
 
 	use \MvcCore\Ext\Controllers\DataGrids\Models\GridRow;
-
+	
 	/**
 	 * @return \MvcCore\Ext\Models\Db\Readers\Streams\Iterator
 	 */

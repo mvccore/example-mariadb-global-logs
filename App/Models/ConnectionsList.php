@@ -5,29 +5,51 @@ namespace App\Models;
 class		ConnectionsList
 extends		\App\Models\Base
 implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
-			\MvcCore\Ext\Controllers\DataGrids\Models\IGridColumns{
-
-	use \App\Models\Connection\Props,
-		\App\Models\Connection\GettersSetters;
+			\MvcCore\Ext\Controllers\DataGrids\Models\IGridColumns {
+	
+	//use \App\Models\Connection\Props;
 
 	use \MvcCore\Ext\Controllers\DataGrids\Models\GridColumns,
 		\MvcCore\Ext\Controllers\DataGrids\Models\GridModel;
 
+	/** @var int */
+	protected $idGeneralLog;
+
+	/** @var \MvcCore\Ext\Models\Db\Connections\MySql */
+	protected $db;
+
+	
+	/** @return int */
+	public function GetIdGeneralLog () {
+		/** @var \App\Models\Connection $this */
+		return $this->idGeneralLog;
+	}
+	/**
+	 * @param  int $idGeneralLog 
+	 * @return \App\Models\Connection
+	 */
+	public function SetIdGeneralLog ($idGeneralLog) {
+		/** @var \App\Models\Connection $this */
+		$this->idGeneralLog = $idGeneralLog;
+		return $this;
+	}
+
+
 	protected function load () {
 		if ($this->offset === NULL) $this->offset = 0;
 		if ($this->limit === NULL) $this->limit = PHP_INT_MAX;
+		
+		$this->db = self::GetConnection();
 
 		list ($countSql, $countParams) = $this->completeSqlAndParamsCount();
 		list ($pageDataSql, $pageDataParams) = $this->completeSqlAndParamsPageData();
 
-		$conn = self::GetConnection();
-
-		$this->totalCount = $conn
+		$this->totalCount = $this->db
 			->Prepare($countSql)
 			->FetchOne($countParams)
 			->ToScalar('total_count', 'int');
 		
-		$this->pageData = $conn
+		$this->pageData = $this->db
 			->Prepare($pageDataSql)
 			->StreamAll($pageDataParams)
 			->ToInstances(
@@ -60,7 +82,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 	}
 
 	protected function completeSqlAndParamsPageData () {
-		$queryTypes = self::GetConnection()
+		$queryTypes = $this->db
 			->Prepare([
 				"SELECT 						",
 				"	q.`id_query_type`,			",
@@ -83,7 +105,7 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 		);
 
 		// sorting:
-		$sortSql = $this->getSortingSql(TRUE, NULL, "``");
+		$sortSql = $this->getSortingSql(TRUE, NULL, $this->db->GetConfig()->driver);
 
 		
 		// offset and limit:
@@ -210,19 +232,22 @@ implements	\MvcCore\Ext\Controllers\DataGrids\Models\IGridModel,
 			"{$sqlCondition} {$sortSql} {$limitSql};					",
 		]);
 		
+		//x([implode("\n", $sql), $params]);
 		return [$sql, $params];
 	}
 	
-	protected function completeConditionSqlAndParams ($collectionsCount = 1) {
+	protected function completeConditionSqlAndParams ($collectionsCount) {
 		$conditionsSqls = [];
 		$params = [];
+		$driver = $this->db->GetConfig()->driver;
 		for ($i = 0; $i < $collectionsCount; $i++) {
 			list ($conditionSqlLocal, $params) = $this->getConditionSqlAndParams(
-				FALSE, 'c', $params, ":param_{$i}_", "``"
+				FALSE, 'c', $params, $driver, ":param_{$i}_", "``"
 			);
 			$params[":id_gen_log_{$i}"] = $this->idGeneralLog;
 			$conditionSql = " WHERE c.`id_general_log` = :id_gen_log_{$i} ";
-			if ($conditionSqlLocal) $conditionSql .= "AND {$conditionSqlLocal} ";
+			if ($conditionSqlLocal) 
+				$conditionSql .= "AND {$conditionSqlLocal} ";
 			$conditionsSqls[$i] = $conditionSql;
 		}
 		//x([$conditionsSqls, $params]);
