@@ -20,10 +20,10 @@ class Install extends Base
 		);
 	}
 	public function IsConfigInstalled () {
-		$sysCfg = \MvcCore\Config::GetSystem();
+		$sysCfg = \MvcCore\Config::GetConfigSystem();
 		if ($sysCfg === NULL) {
 			\MvcCore\Config::ClearConfigCache();
-			$sysCfg = \MvcCore\Config::GetSystem();
+			$sysCfg = \MvcCore\Config::GetConfigSystem();
 		}
 		return $sysCfg !== NULL;
 	}
@@ -49,7 +49,7 @@ class Install extends Base
 			foreach ($cmds as $cmd) 
 				if (mb_strpos($cmd, 'CREATE TABLE ') !== FALSE)
 					$installScriptTablesCnt++;
-			$dbCfg = \MvcCore\Config::GetSystem()->db;
+			$dbCfg = \MvcCore\Config::GetConfigSystem()->db;
 			$dbTablesCnt = self::GetConnection($dbCfg)
 				->Prepare([
 					"SELECT COUNT(*) AS `cnt`			",
@@ -123,7 +123,7 @@ class Install extends Base
 			"database without credentials from app config."
 		);
 		$cmds = $this->getDbInstallCommands();
-		$dbCfg = \MvcCore\Config::GetSystem()->db;
+		$dbCfg = \MvcCore\Config::GetConfigSystem()->db;
 		$dbName = $dbCfg->database;
 		$dbCfg->database = 'information_schema';
 		$db = self::GetConnection($dbCfg);

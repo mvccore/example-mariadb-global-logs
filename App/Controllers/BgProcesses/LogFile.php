@@ -32,7 +32,7 @@ class LogFile extends \App\Controllers\BgProcesses\Base
 	public function IndexAction () {
 		$this->generalLog = $this->bgProcess->GetGeneralLog();
 
-		$sysCfg = $this->GetSystemConfig();
+		$sysCfg = $this->GetConfigSystem();
 		$this->ignoredUsers = isset($sysCfg->ignore->users) && is_array($sysCfg->ignore->users)
 			? $sysCfg->ignore->users
 			: [];

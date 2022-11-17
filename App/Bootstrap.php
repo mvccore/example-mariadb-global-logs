@@ -17,7 +17,7 @@ class Bootstrap {
 			$app->SetDebugClass('\MvcCore\Ext\Debugs\Tracy');
 		}
 		
-		\MvcCore\Config::SetSystemConfigPath(
+		\MvcCore\Config::SetConfigSystemPath(
 			\App\Models\Base::GetSysConfigRelPath()
 		);
 

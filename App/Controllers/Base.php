@@ -8,7 +8,7 @@ class Base extends \MvcCore\Controller {
 
 	public function Init () {
 		parent::Init();
-		$sysCfg = \MvcCore\Config::GetSystem();
+		$sysCfg = \MvcCore\Config::GetConfigSystem();
 		if ($sysCfg === NULL) {
 			$defaultCfgPath = \App\Models\Install::GetSysConfigRelPathDefault();
 			$sysCfg = \MvcCore\Config::GetConfig($defaultCfgPath);
@@ -46,9 +46,9 @@ class Base extends \MvcCore\Controller {
 	}
 
 	private function _preDispatchSetUpBundles () {
-		$cfg = $this->GetSystemConfig();
+		$cfg = $this->GetConfigSystem();
 		\MvcCore\Ext\Views\Helpers\Assets::SetGlobalOptions(
-			(array) \MvcCore\Config::GetSystem()->assets
+			(array) $cfg->assets
 		);
 		$static = self::$staticPath;
 		$this->view->Css('fixedHead')
