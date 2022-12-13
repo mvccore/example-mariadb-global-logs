@@ -6,6 +6,8 @@ class Connections extends \App\Controllers\Base {
 
 	/** @var \App\Models\LogFile */
 	protected $generalLog;
+	/** @var \MvcCore\Ext\Controllers\DataGrid */
+	protected $grid;
 
 	public function Init () {
 		parent::Init();

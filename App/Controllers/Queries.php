@@ -10,6 +10,8 @@ class Queries extends \App\Controllers\Base
 	protected $generalLog;
 	/** @var \MvcCore\Ext\Models\Db\Readers\Streams\Iterator */
 	protected $queries;
+	/** @var \MvcCore\Ext\Models\Db\Readers\Streams\Iterator */
+	protected $queriesStream;
 
 	public function IndexAction () {
 		$idConnection = $this->GetParam('id_connection', '0-9', NULL, 'int');
