@@ -47,9 +47,11 @@ class Base extends \MvcCore\Controller {
 
 	private function _preDispatchSetUpBundles () {
 		$cfg = $this->GetConfigSystem();
-		\MvcCore\Ext\Views\Helpers\Assets::SetGlobalOptions(
-			(array) $cfg->assets
-		);
+		if ($cfg !== NULL) {
+			\MvcCore\Ext\Views\Helpers\Assets::SetGlobalOptions(
+				(array) $cfg->assets
+			);
+		}
 		$static = self::$staticPath;
 		$this->view->Css('fixedHead')
 			->AppendRendered($static . '/css/fonts.css')

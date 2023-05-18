@@ -13,21 +13,21 @@ class Index extends Base {
 		$this->view->dataDir = \App\Models\Base::GetDataDir();
 		$this->view->logsProcessingProgressesUrl = $this->Url(':LogsProcessingProgresses');
 		$form = $this->getListProcessingStartForm();
+		$form->Init();
+		$form->PreDispatch();
 		$this->view->errors = $form->GetErrors();
-		$form->ClearSession();
-		list (
-			$this->view->csrfName, 
-			$this->view->csrfValue
-		) = $form->SetUpCsrf();
+		$formCsrf = $form->GetCsrf();
+		list ($this->view->csrfName, $this->view->csrfValue) = [
+			$formCsrf->name, $formCsrf->value
+		];
 		$this->view->Js('varFoot')
 			->Append(self::$staticPath . '/js/LogsList.js');
 	}
 
 	/** @return void */
 	public function ProcessingStartAction () {
-
 		$form = $this->getListProcessingStartForm();
-		list($result) = $form->Submit();
+		list($result, $errors, $data) = $form->Submit();
 		if ($result !== \MvcCore\Ext\IForm::RESULT_ERRORS) {
 			try {
 				$hash = $this->GetParam('hash', 'a-zA-Z0-9');
@@ -65,7 +65,7 @@ class Index extends Base {
 				/** @var \App\Models\BgProcess $bgProcess */
 				$bgProcess = $bgProcesses[$logFileId];
 				$progress = $bgProcess->GetProgress();
-				$progressFormatted = number_format($progress, 2, '.', '');
+				$progressFormatted = number_format($progress ?: 0.0, 2, '.', '');
 				$done = !($progress < 100.0);
 				if ($done) {
 					$progressText = 'Processed';
@@ -114,9 +114,13 @@ class Index extends Base {
 	 */
 	protected function getBgProcessProgressText ($bgProcess, $progress, $progressFormatted) {
 		$processingText = 'Processing';
-		if ($progress === 0.0) return $processingText;
-		$started = $bgProcess->GetStarted();
+		if ($progress === 0.0 || $progress === NULL) return $processingText;
 		$now = new \DateTime('now');
+		$secondInterval = new \DateInterval('PT1S');
+		$secondInterval->invert = 1;
+		$prevSec = clone $now;
+		$prevSec->add($secondInterval);
+		$started = $bgProcess->GetStarted() ?: $prevSec;
 		$now->setTimezone(new \DateTimeZone('UTC'));
 		$spentTime = $now->diff($started);
 		$spentSeconds = $now->getTimestamp() - $started->getTimestamp();

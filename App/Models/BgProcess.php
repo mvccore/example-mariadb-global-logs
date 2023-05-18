@@ -371,7 +371,7 @@ class BgProcess extends \App\Models\Base
 				])
 				->FetchOne([':id'	=> $this->id])
 				->ToScalar('created');
-			$createdDateTime = static::parseToDateTime($createdRawValue, ['Y-m-d H:i:s', 'UTC']);
+			$createdDateTime = static::parseToDateTime('DateTime', $createdRawValue, ['Y-m-d H:i:s', 'UTC']);
 			if ($createdDateTime !== FALSE) 
 				$this->created = $createdDateTime;
 			$this->initialValues = array_merge([], $this->initialValues, [

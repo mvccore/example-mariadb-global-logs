@@ -69,7 +69,7 @@ class Install extends Base
 	public function InstallConfig () {
 		$appRoot = self::getAppRootDir();
 		$sourceFullPath = $appRoot . mb_substr(self::$_sysCfgRelPathDefault, 1);
-		$targetFullPath = $appRoot . mb_substr(\App\Models\Install::GetSysConfigRelPath());
+		$targetFullPath = $appRoot . mb_substr(\App\Models\Install::GetSysConfigRelPath(), 1);
 		if (!file_exists($sourceFullPath)) {
 			throw new \Exception(
 				"Default config doesn't exist in location: {$sourceFullPath}."
