@@ -16,6 +16,8 @@ class Index extends Base {
 		$form->Init();
 		$form->PreDispatch();
 		$this->view->errors = $form->GetErrors();
+		$form->SetErrors([]);
+		$form->SaveSession();
 		$formCsrf = $form->GetCsrf();
 		list ($this->view->csrfName, $this->view->csrfValue) = [
 			$formCsrf->name, $formCsrf->value
@@ -29,6 +31,7 @@ class Index extends Base {
 		$form = $this->getListProcessingStartForm();
 		list($result, $errors, $data) = $form->Submit();
 		if ($result !== \MvcCore\Ext\IForm::RESULT_ERRORS) {
+			$form->ClearSession();
 			try {
 				$hash = $this->GetParam('hash', 'a-zA-Z0-9');
 				/** @var \App\Models\LogFile $logFile */
