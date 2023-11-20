@@ -104,7 +104,7 @@ trait Props {
 	 *    "sort": true,
 	 *    "filter": false
 	 * })
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $database;
 
