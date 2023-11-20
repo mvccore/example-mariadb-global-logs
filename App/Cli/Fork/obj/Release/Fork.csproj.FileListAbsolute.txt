@@ -1,4 +1,0 @@
-c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\obj\Release\Fork.exe
-c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork.exe
-c:\works\home\r-webdog\tec\mariadb-global-logs\Var\Cli\Fork.exe
-c:\works\home\r-webdog\tec\mariadb-global-logs\App\Cli\Fork\obj\Release\Fork.csprojAssemblyReference.cache
