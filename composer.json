@@ -31,6 +31,7 @@
 		"mvccore/ext-form-field-date": "^5.0",
 		"mvccore/ext-form-field-selection": "^5.0",
 		"mvccore/ext-controller-datagrid": "^5.1.17",
+		"mvccore/ext-tool-cli-winfork": "^5.0.0",
 		"mvccore/ext-debug-tracy": "^5.0",
 		"mvccore/ext-debug-tracy-mvccore": "^5.0",
 		"mvccore/ext-debug-tracy-routing": "^5.0",
