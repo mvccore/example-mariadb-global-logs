@@ -40,7 +40,7 @@ class Install extends Base
 		$targetFilesCount = 0;
 		foreach ($srcDi as $item) if (!$item->isDir() && !$item->isDot()) $srcFilesCount++;
 		foreach ($targetDi as $item) if (!$item->isDir() && !$item->isDot()) $targetFilesCount++;
-		return $srcFilesCount === $targetFilesCount;
+		return $targetFilesCount >= $srcFilesCount;
 	}
 	public function IsDbInstalled () {
 		try {
