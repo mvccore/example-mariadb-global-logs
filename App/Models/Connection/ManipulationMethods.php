@@ -26,15 +26,16 @@ trait ManipulationMethods {
 		$result = TRUE;
 		$data = $this->GetValues(
 			self::PROPS_PROTECTED |
-			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES |
+			self::PROPS_GET_SCALAR_VALUES
 		);
 		unset($data['user'], $data['database']);
 		
 		$params = [];
 		$sqlItems = [];
-		foreach ($data as $columnName => $value) {
+		foreach ($data as $columnName => $scalarValue) {
 			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'idConnection') continue;
-			$params[":{$columnName}"] = self::convertToScalar($value);
+			$params[":{$columnName}"] = $scalarValue;
 			$sqlItems[] = "`{$columnName}`";
 		}
 
@@ -73,7 +74,8 @@ trait ManipulationMethods {
 		/** @var \App\Models\Connection $this */
 		$data = $this->GetTouched(
 			self::PROPS_PROTECTED |
-			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES |
+			self::PROPS_GET_SCALAR_VALUES
 		);
 		unset($data['user'],$data['database']);
 		if (count($data) === 0) 
@@ -81,9 +83,9 @@ trait ManipulationMethods {
 		
 		$params = [];
 		$colsSql = [];
-		foreach ($data as $columnName => $value) {
+		foreach ($data as $columnName => $scalarValue) {
 			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'idConnection') continue;
-			$params[":{$columnName}"] = self::convertToScalar($value);
+			$params[":{$columnName}"] = $scalarValue;
 			$colsSql[] = "`{$columnName}` = :{$columnName}";
 		};
 		$params[':id'] = $this->idConnection;

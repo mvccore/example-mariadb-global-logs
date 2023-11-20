@@ -127,13 +127,14 @@ class LogFile extends \App\Models\Base
 		$this->processed = self::NOT_PROCESSED;
 		$data = $this->GetValues(
 			self::PROPS_PROTECTED |
-			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES |
+			self::PROPS_GET_SCALAR_VALUES
 		);
 		$params = [];
 		$sqlItems = [];
-		foreach ($data as $columnName => $value) {
+		foreach ($data as $columnName => $scalarValue) {
 			if ($columnName === 'id_general_log') continue;
-			$params[":{$columnName}"] = self::convertToScalar($value);
+			$params[":{$columnName}"] = $scalarValue;
 			$sqlItems[] = "`{$columnName}`";
 		}
 		$db = self::GetConnection();
@@ -166,15 +167,16 @@ class LogFile extends \App\Models\Base
 	public function Update ($flags = 0) {
 		$data = $this->GetTouched(
 			self::PROPS_PROTECTED |
-			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES |
+			self::PROPS_GET_SCALAR_VALUES
 		);
 		if (count($data) === 0) 
 			return FALSE;
 		$params = [':id_general_log' => $this->idGeneralLog];
 		$colsSql = [];
-		foreach ($data as $columnName => $value) {
+		foreach ($data as $columnName => $scalarValue) {
 			if ($columnName === 'id_general_log') continue;
-			$params[":{$columnName}"] = self::convertToScalar($value);
+			$params[":{$columnName}"] = $scalarValue;
 			$colsSql[] = "`{$columnName}` = :{$columnName}";
 		};
 		$result = self::GetConnection()

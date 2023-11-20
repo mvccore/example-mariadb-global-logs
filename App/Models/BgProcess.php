@@ -328,17 +328,18 @@ class BgProcess extends \App\Models\Base
 		$data = $this->GetValues(
 			self::PROPS_INHERIT |
 			self::PROPS_PROTECTED |
-			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES |
+			self::PROPS_GET_SCALAR_VALUES
 		);
 
 		$params = [];
 		$sqlItems = [];
-		foreach ($data as $columnName => $value) {
+		foreach ($data as $columnName => $scalarValue) {
 			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'id') continue;
 			if ($columnName == 'progress') {
-				$scalarValue = number_format($value, 2, '.', '');
+				$scalarValue = number_format($scalarValue, 2, '.', '');
 			} else {
-				$scalarValue = self::convertToScalar($value);
+				$scalarValue = $scalarValue;
 			}
 			$params[":{$columnName}"] = $scalarValue;
 			$sqlItems[] = "`{$columnName}`";
@@ -392,16 +393,17 @@ class BgProcess extends \App\Models\Base
 		$data = $this->GetTouched(
 			self::PROPS_INHERIT |
 			self::PROPS_PROTECTED |
-			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES
+			self::PROPS_CONVERT_CAMELCASE_TO_UNDERSCORES |
+			self::PROPS_GET_SCALAR_VALUES
 		);
 		if (count($data) === 0) 
 			return FALSE;
 
 		$params = [];
 		$colsSql = [];
-		foreach ($data as $columnName => $value) {
+		foreach ($data as $columnName => $scalarValue) {
 			if (mb_substr($columnName, 0, 1) === '_' || $columnName === 'id') continue;
-			$params[":{$columnName}"] = self::convertToScalar($value);
+			$params[":{$columnName}"] = $scalarValue;
 			$colsSql[] = "`{$columnName}` = :{$columnName}";
 		};
 		$params[':id'] = $this->id;
