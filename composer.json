@@ -42,5 +42,10 @@
 		"mvccore/ext-view-helper-truncate": "^5.0",
 		"jdorn/sql-formatter": "1.3.x-dev"
 	},
-	"minimum-stability": "stable"
+	"minimum-stability": "stable",
+	"config": {
+		"allow-plugins": {
+			"civicrm/composer-compile-plugin": true
+		}
+	}
 }
