@@ -70,7 +70,7 @@ class Dispatcher extends \App\Controllers\Base
 		} catch (\Throwable $e) {
 			$ctrlSerialized = serialize($this->execController);
 			$date = date('y-m-d_H-i-s_v', time());
-			$dumpFullPath = $this->request->GetAppRoot().'/Var/Logs/exec_ctrl_'.$date.'.dump';
+			$dumpFullPath = $this->application->GetPathLogs(TRUE).'/exec_ctrl_'.$date.'.dump';
 			file_put_contents($dumpFullPath, $ctrlSerialized);
 			if ($this->request->IsCli()) {
 				\MvcCore\Debug::Log($e);

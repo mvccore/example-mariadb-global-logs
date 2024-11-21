@@ -38,7 +38,7 @@ class Connections extends \App\Controllers\Base {
 		$this->view->backLink = $this->Url('Index:Index');
 
 		$this->view->Js('varFoot')
-			->Append(self::$staticPath . '/js/Marking.js');
+			->Append($this->application->GetPathStatic() . '/js/Marking.js');
 	}
 
 	protected function completeParams () {

@@ -52,7 +52,7 @@ class Base extends \MvcCore\Controller {
 				(array) $cfg->assets
 			);
 		}
-		$static = self::$staticPath;
+		$static = $this->application->GetPathStatic();
 		$this->view->Css('fixedHead')
 			->AppendRendered($static . '/css/fonts.css')
 			->AppendRendered($static . '/css/all.css');

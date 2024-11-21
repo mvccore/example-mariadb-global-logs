@@ -65,8 +65,11 @@ composer-update.*
 
 # Application tmp dirs
 Var/Tmp/*
+!Var/Tmp/.dummy
 Var/Logs/*
+!Var/Logs/.dummy
 Var/Cli/*
-www/static/tmp
+static/tmp/*
+!static/tmp/.dummy
 Data/*
 mysql_global_logs.ini

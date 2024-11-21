@@ -36,6 +36,6 @@ class Queries extends \App\Controllers\Base
 		);
 
 		$this->view->Js('varHead')
-			->Append(self::$staticPath . '/js/Queries.js');
+			->Append($this->application->GetPathStatic() . '/js/Queries.js');
 	}
 }

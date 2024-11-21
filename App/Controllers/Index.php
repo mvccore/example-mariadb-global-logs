@@ -23,7 +23,7 @@ class Index extends Base {
 			$formCsrf->name, $formCsrf->value
 		];
 		$this->view->Js('varFoot')
-			->Append(self::$staticPath . '/js/LogsList.js');
+			->Append($this->application->GetPathStatic() . '/js/LogsList.js');
 	}
 
 	/** @return void */

@@ -32,7 +32,7 @@ class Base extends \MvcCore\Ext\Models\Db\Models\MySql {
 	}
 	protected static function getAppRootDir () {
 		return self::$_appRoot ?: (
-			self::$_appRoot = \MvcCore\Application::GetInstance()->GetRequest()->GetAppRoot()
+			self::$_appRoot = \MvcCore\Application::GetInstance()->GetPathAppRoot()
 		);
 	}
 }
